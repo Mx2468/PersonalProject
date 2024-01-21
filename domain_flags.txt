@@ -1,0 +1,92 @@
+[-fzero-call-used-regs=choice]
+    choices:
+    'skip'
+    'used'
+    'all'
+    'leafy'
+    'used-gpr'
+    'all-gpr'
+    'leafy-gpr'
+    'used-arg'
+    'all-arg'
+    'leafy-arg'
+    'used-gpr-arg'
+    'all-gpr-arg'
+    'leafy-gpr-arg'
+[-ffp-contract=style]
+    choices:
+    'fast'
+    'on'
+    'off' (default, standard-compliant)
+[-finline-limit=n]
+[-fira-algorithm=algorithm]
+    choices:
+    'priority'
+    'CB (Default)
+[-fira-region=region]
+    choices:
+    'all'
+    'mixed'
+    'one'
+[-fsched-stalled-insns
+-fsched-stalled-insns=n]
+[-fsched-stalled-insns-dep
+-fsched-stalled-insns-dep=n]
+[-flive-patching=level]
+    choices:
+    'inline-clone' (Default)
+    'inline-only-static'
+[-ftree-parallelize-loops=n]
+[-ftrivial-auto-var-init=choice]
+    choices:
+    'uninitialized' (Default)
+    'pattern'
+    'zeto'
+[-fvect-cost-model=model]
+    choices:
+    ‘unlimited’
+    ‘dynamic’
+    ‘cheap’
+    ‘very-cheap'
+[-fsimd-cost-model=model]
+    choices:
+    'unlimited'
+    'dynamic'
+    'cheap'
+[-freorder-blocks-algorithm=algorithm]
+    choices:
+    'simple'
+    'stc'
+[-falign-functions
+-falign-functions=n
+-falign-functions=n:m
+-falign-functions=n:m:n2
+-falign-functions=n:m:n2:m2]
+-flimit-function-alignment
+[-falign-labels
+-falign-labels=n
+-falign-labels=n:m
+-falign-labels=n:m:n2
+-falign-labels=n:m:n2:m2]
+[-falign-loops
+-falign-loops=n
+-falign-loops=n:m
+-falign-loops=n:m:n2
+-falign-loops=n:m:n2:m2]
+[-falign-jumps
+-falign-jumps=n
+-falign-jumps=n:m
+-falign-jumps=n:m:n2
+-falign-jumps=n:m:n2:m2]
+[-flto[=n]]
+[-flto-partition=alg]
+    choice:
+    '1to1'
+    'balanced' (Default)
+    'max'
+    'none'
+[-flto-compression-level=n]
+[-fexcess-precision=style]
+    choices:
+    'fast'
+    'standard'
