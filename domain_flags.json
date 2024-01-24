@@ -1,0 +1,198 @@
+{
+    "flags": [
+        {
+            "flagname": "-fzero-call-used-regs",
+            "domaintype": "Choice",
+            "choices": [
+                "skip",
+                "used",
+                "all",
+                "leafy",
+                "used-gpr",
+                "all-gpr",
+                "leafy-gpr",
+                "used-arg",
+                "all-arg",
+                "leafy-arg",
+                "used-gpr-arg",
+                "all-gpr-arg",
+                "leafy-gpr-arg"
+            ],
+            "default": "skip"
+        },
+
+        {
+            "flagname": "-ffp-contract",
+            "domaintype": "Choice",
+            "choices": [
+                "off",
+                "fast",
+                "on"
+            ],
+            "default": "off"
+        },
+
+        {
+            "flagname": "-finline-limit",
+            "domaintype": "Integer",
+            "default": "1"
+        },
+
+        {
+            "flagname": "-fira-algorithm",
+            "domaintype": "Choice",
+            "choices": [
+                "priority",
+                "CB"
+            ],
+            "default": "CB"
+        },
+
+        {
+            "flagname": "-fira-region",
+            "domaintype": "Choice",
+            "choices": [
+                "all",
+                "mixed",
+                "one"
+            ],
+            "default": "mixed"
+        },
+
+        {
+            "flagname": "-fsched-stalled-insns",
+            "domaintype": "Integer-or-binary",
+            "default": "1"
+        },
+
+        {
+            "flagname": "-fsched-stalled-insns-dep",
+            "domaintype": "Integer-or-binary",
+            "default": "1"
+        },
+
+        {
+            "flagname": "-fsched-stalled-insns-dep",
+            "domaintype": "Choice",
+            "choices": [
+                "inline-clone",
+                "inline-only-static"
+            ],
+            "default": "inline-clone"
+        },
+
+        {
+            "flagname": "-ftree-parallelize-loops",
+            "domaintype": "Integer",
+            "default": "1"
+        },
+
+        {
+            "flagname": "-ftrivial-auto-var-init",
+            "domaintype": "Choice",
+            "choices": [
+                "uninitialized",
+                "pattern",
+                "zeto"
+            ],
+            "default": "uninitialized"
+        },
+
+        {
+            "flagname": "-fvect-cost-model",
+            "domaintype": "Choice",
+            "choices": [
+                "unlimited",
+                "dynamic",
+                "cheap",
+                "very-cheap"
+            ],
+            "default": "dynamic"
+        },
+
+        {
+            "flagname": "-fsimd-cost-model",
+            "domaintype": "Choice",
+            "choices": [
+                "unlimited",
+                "dynamic",
+                "cheap"
+            ],
+            "default": "dynamic"
+        },
+
+        {
+            "flagname": "-freorder-blocks-algorithm",
+            "domaintype": "Choice",
+            "choices": [
+                "simple",
+                "stc"
+            ],
+            "default": "simple"
+        },
+
+        {
+            "flagname": "-finline-limit",
+            "domaintype": "Integer",
+            "default": "1"
+        },
+
+        {
+            "flagname": "-falign-labels",
+            "domaintype": "Integer-align",
+            "default": "1"
+        },
+
+        {
+            "flagname": "-falign-functions",
+            "domaintype": "Integer-align",
+            "default": "1"
+        },
+
+        {
+            "flagname": "-falign-loops",
+            "domaintype": "Integer-align",
+            "default": "1"
+        },
+
+        {
+            "flagname": "-falign-jumps",
+            "domaintype": "Integer-align",
+            "default": "1"
+        },
+
+        {
+            "flagname": "-flto",
+            "domaintype": "Integer",
+            "default": "1"
+        },
+
+        {
+            "flagname": "-flto-partition",
+            "domaintype": "Choice",
+            "choices": [
+                    "1to1",
+                    "balanced",
+                    "max",
+                    "none"
+            ],
+            "default": "balanced"
+        },
+
+        {
+            "flagname": "-flto-compression-level",
+            "domaintype": "Integer",
+            "default": "1"
+        },
+
+        {
+            "flagname": "-fexcess-precision",
+            "domaintype": "Choice",
+            "choices": [
+                    "fast",
+                    "standard"
+            ],
+            "default": "standard"
+        }
+    ]
+ }
