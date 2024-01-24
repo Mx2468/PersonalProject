@@ -3,6 +3,8 @@ from time import time
 import subprocess
 import flag_reader
 import random_search
+import sys
+import signal
 
 SOURCE_CODE_FILE = "./test_cases/BreadthFSSudoku.cpp"
 COMPILED_CODE_FILE = "filetotest"
@@ -54,11 +56,33 @@ def opt_loop(n: int, flags: list[str]) -> dict[str, bool]:
             fastest_flags = flag_choice
     return fastest_flags
 
+
+def return_results(signal_obj, frame):
+    print('You pressed ^C!')
+    print(f"Globals: {frame.f_locals["self"]}")
+    print(f"The fastest flags were: {frame.f_locals["fastest_flags"]}")
+    print(f"The fastest time of these flags was: {frame.f_locals["fastest_time"]}")
+    sys.exit(0)
+def anytime_loop(flags: list[str]) -> dict[str, bool]:
+    fastest_time = None
+    fastest_flags = None
+    states_explored = 0
+    signal.signal(signal.SIGINT, return_results)
+    while states_explored < 2**230:
+        flag_choice = random_search.random_search(flags)
+        flag_choice = validate_flag_choices(flag_choice)
+        current_time = test_compilation_with_flag(run_compiled_code,
+                                                  opt_flag=create_flag_string(flag_choice))
+        if fastest_time is None or current_time < fastest_time:
+            fastest_time = current_time
+            fastest_flags = flag_choice
+    return fastest_flags
+
 if __name__ == '__main__':
     flags = flag_reader.read_binary_flags()
     #TODO - make a way for this to run indefinite numbers of times/anytime algorithm ( keep the definite number of times if possible just in case)
-    fastest_flags = opt_loop(100, flags)
-    print(fastest_flags)
+    result = anytime_loop(flags)
+    print(result)
     # print("Trying with O0")
     # o0 = test_compilation_with_flag(run_compiled_code, opt_flag="O0")
     # print("Trying with O1")
