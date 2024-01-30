@@ -1,0 +1,1 @@
+conda create -f ./personal_project_envrionment.sh -p ../
