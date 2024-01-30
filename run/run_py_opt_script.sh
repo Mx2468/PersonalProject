@@ -1,3 +1,2 @@
-#!/usr/bin/env sh
-conda activate PersonalProject
-python flag_controller.py
+#!/usr/bin/env bash
+conda run --live-stream -n PersonalProject python flag_controller.py
