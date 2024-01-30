@@ -23,7 +23,7 @@ def run_compiled_code():
     subprocess.run(f"./{COMPILED_CODE_FILE}", shell=True, cwd=os.getcwd())
 
 def test_compilation_with_flag(function_to_benchmark: callable, opt_flag: str = "O0") -> float:
-    subprocess.run([f"g++ {opt_flag} -w -I./csmith/include/ -o {COMPILED_CODE_FILE} {SOURCE_CODE_FILE}"],
+    subprocess.run([f"g++ {opt_flag} -w -o {COMPILED_CODE_FILE} {SOURCE_CODE_FILE}"],
                    shell=True, cwd=os.getcwd())
     return time_needed(3, function_to_benchmark)
 
