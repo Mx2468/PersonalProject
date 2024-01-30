@@ -1,4 +1,4 @@
-""" Helper methods that benchmark a set of flags"""
+""" A class containing the benchmarking info and behaviour"""
 
 from time import time
 import subprocess
@@ -8,6 +8,7 @@ DEFAULT_COMPILED_FILE_NAME = "filetotest"
 
 
 class Benchmarker:
+    """ A class containing the benchmarking info and behaviour"""
     def __init__(self, source_code_to_benchmark: str, compiled_file_name: str = DEFAULT_COMPILED_FILE_NAME):
         self.SOURCE_CODE_FILE = source_code_to_benchmark
         self.COMPILED_CODE_FILE = compiled_file_name
