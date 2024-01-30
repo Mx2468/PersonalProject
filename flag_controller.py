@@ -78,20 +78,19 @@ class FlagOptimisationController:
                 fastest_flags = flag_choice
         return fastest_flags
 
-    @staticmethod
-    def return_results(signal_obj, frame):
-        print('You pressed ^C!')
-        print(f"Globals: {frame.f_locals["self"]}")
-        print(f"The fastest flags were: {frame.f_locals["fastest_flags"]}")
-        print(f"The fastest time of these flags was: {frame.f_locals["fastest_time"]}")
-        sys.exit(0)
-
     def anytime_loop(self, flags: list[str]) -> dict[str, bool]:
         """ Runs the optimisation loop until the computation is stopped via ctrl+c"""
         fastest_time = None
-        fastest_flags = None
+        fastest_flags = flags
         states_explored = 0
-        signal.signal(signal.SIGINT, self.return_results)
+        def return_results(*args):
+            print('You pressed ^C!')
+            print(f"States Explored: {states_explored}")
+            print(f"Fastest Time: {fastest_time}s")
+            print(f"Fastest Flags: {self.create_flag_string(fastest_flags)}")
+            sys.exit(0)
+
+        signal.signal(signal.SIGINT, return_results)
         while states_explored < 2 ** 230:
             flag_choice = random_search.random_search(flags)
             validated_flag_choice = self.validate_flag_choices(flag_choice)
@@ -101,6 +100,8 @@ class FlagOptimisationController:
             if fastest_time is None or current_time < fastest_time:
                 fastest_time = current_time
                 fastest_flags = flag_choice
+
+            states_explored += 1
         return fastest_flags
 
 
