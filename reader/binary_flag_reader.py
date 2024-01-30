@@ -2,6 +2,7 @@
 from os import read
 from reader.flag_file_reader import FlagFileReader
 
+
 class BinaryFlagReader(FlagFileReader):
     """
     Reads binary (yes/no) flag choices from a .txt file,
@@ -11,9 +12,7 @@ class BinaryFlagReader(FlagFileReader):
     def __init__(self, file_name: str):
         super().__init__(file_name)
 
-    def read_in_flags(self) -> list[str]:
+    def read_in_flags(self) -> None:
         """Read binary flags from the known location"""
-        with open("../binary_flags.txt", "r") as flagfile:
-            # Simple libe-by-line reading
-            flags = [line.strip() for line in flagfile]
-            return flags
+        # Simple line-by-line reading
+        self.flags = [line.strip() for line in self.file]
