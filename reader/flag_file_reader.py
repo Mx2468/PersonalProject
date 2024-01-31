@@ -28,6 +28,6 @@ class FlagFileReader(ABC):
         """
         raise NotImplementedError
 
-    def get_flags(self) -> None:
+    def get_flags(self) -> list[str]:
         """Return flags that have been read in"""
         return self.flags
