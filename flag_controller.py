@@ -29,31 +29,6 @@ class FlagOptimisationController:
             flag_reader.read_in_flags()
             self.flags = flag_reader.get_flags()
 
-    #TODO Move below code to optimiser for n-step optimisation
-
-    # def opt_loop(self, n: int, ) -> dict[str, bool]:
-    #     """
-    #     Performs n optimisation steps iteratively on the flags passed in
-    #
-    #     :param n: Number of optimisation loop iterations to perform
-    #     :param flags_to_optimise: List of flag names to optimise
-    #
-    #     :return: Dictionary with optimal flag combination.
-    #     """
-    #     fastest_time = None
-    #     fastest_flags = None
-    #     for i in range(n):
-    #         flag_choice = random_search.random_search(flags_to_optimise)
-    #         validated_flag_choice = validate_flag_choices(flag_choice)
-    #         current_time = benchmarking.benchmark_flag_choices(
-    #             source_code_file_name=self.SOURCE_CODE_FILE,
-    #             compiled_file_name=self.COMPILED_CODE_FILE,
-    #             opt_flag=create_flag_string(validated_flag_choice))
-    #         if fastest_time is None or current_time < fastest_time:
-    #             fastest_time = current_time
-    #             fastest_flags = flag_choice
-    #     return fastest_flags
-
     def anytime_optimisation(self,
                              optimiser: FlagOptimiser,
                              benchmark_obj: Benchmarker) -> dict[str, bool]:
