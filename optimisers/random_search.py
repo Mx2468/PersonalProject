@@ -37,7 +37,30 @@ class RandomSearchOptimiser(FlagOptimiser):
         self.clear_between_runs()
         return flags_to_return
 
-    # TODO Implement n-steps optimisation in random search class
+    def n_steps_optimise(self, benchmark_obj: Benchmarker, n: int) -> dict[str, bool]:
+        """
+        Performs n optimisation steps iteratively on the flags passed in
+
+        :param n: Number of optimisation loop iterations to perform
+        :param flags_to_optimise: List of flag names to optimise
+
+        :return: Dictionary with optimal flag combination.
+        """
+        for i in range(n):
+            self.current_flags = self.optimisation_step(self.current_flags)
+
+            validated_flag_choice = validate_flag_choices(self.current_flags)
+            current_time = benchmark_obj.benchmark_flag_choices(
+                opt_flag=create_flag_string(validated_flag_choice))
+
+            if self.fastest_time is None or current_time < self.fastest_time:
+                self.fastest_time = current_time
+                self.fastest_flags = self.current_flags
+
+        # Clean up class for next optimisation run before returning flags
+        flags_to_return = self.fastest_flags
+        self.clear_between_runs()
+        return flags_to_return
 
     def clear_between_runs(self):
         """ Clears all the lingering state in the class between optimisation runs """
