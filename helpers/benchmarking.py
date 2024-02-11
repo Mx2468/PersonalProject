@@ -8,7 +8,7 @@ DEFAULT_COMPILED_FILE_NAME = "filetotest"
 
 
 class Benchmarker:
-    """ A class containing the benchmarking info and behaviour"""
+    """A class containing the benchmarking info and behaviour"""
     def __init__(self, source_code_to_benchmark: str, compiled_file_name: str = DEFAULT_COMPILED_FILE_NAME):
         self.SOURCE_CODE_FILE = source_code_to_benchmark
         self.COMPILED_CODE_FILE = compiled_file_name
@@ -22,7 +22,7 @@ class Benchmarker:
 
 
     def benchmark_flag_choices(self,
-                               opt_flag: str = "O0",
+                               opt_flag: str = "-O0",
                                number_of_runs: int = 3) -> float:
         """
         Compiles a source file with given flag choices
@@ -44,5 +44,14 @@ class Benchmarker:
 
 
     def run_compiled_code(self) -> None:
-        """ Executes the compiled code file """
+        """Executes the compiled code file """
         subprocess.run(f"./{self.COMPILED_CODE_FILE}", shell=True, cwd=os.getcwd())
+
+    def compare_with_o3(self, opt_flag: str) -> None:
+        """Benchmarks the flags against the -O3 "golden standard" and returns the better one"""
+        flags_time = self.benchmark_flag_choices(opt_flag)
+        o3_time = self.benchmark_flag_choices("-O3")
+        if flags_time < o3_time:
+            print("These flags are better than O3!")
+        else:
+            print("These flags perform just as well or worse than O3")
