@@ -29,7 +29,6 @@ class FlagOptimisationController:
             flag_reader.read_in_flags()
             self.flags = flag_reader.get_flags()
 
-    #TODO Move below code to optimiser for n-step optimisation
     def n_times_optimisation(self,
                              n_steps: int,
                              optimiser: FlagOptimiser,
