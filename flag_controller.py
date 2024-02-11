@@ -30,29 +30,22 @@ class FlagOptimisationController:
             self.flags = flag_reader.get_flags()
 
     #TODO Move below code to optimiser for n-step optimisation
-
-    # def opt_loop(self, n: int, ) -> dict[str, bool]:
-    #     """
-    #     Performs n optimisation steps iteratively on the flags passed in
-    #
-    #     :param n: Number of optimisation loop iterations to perform
-    #     :param flags_to_optimise: List of flag names to optimise
-    #
-    #     :return: Dictionary with optimal flag combination.
-    #     """
-    #     fastest_time = None
-    #     fastest_flags = None
-    #     for i in range(n):
-    #         flag_choice = random_search.random_search(flags_to_optimise)
-    #         validated_flag_choice = validate_flag_choices(flag_choice)
-    #         current_time = benchmarking.benchmark_flag_choices(
-    #             source_code_file_name=self.SOURCE_CODE_FILE,
-    #             compiled_file_name=self.COMPILED_CODE_FILE,
-    #             opt_flag=create_flag_string(validated_flag_choice))
-    #         if fastest_time is None or current_time < fastest_time:
-    #             fastest_time = current_time
-    #             fastest_flags = flag_choice
-    #     return fastest_flags
+    def n_times_optimisation(self,
+                             n_steps: int,
+                             optimiser: FlagOptimiser,
+                             benchmark_obj: Benchmarker) -> dict[str, bool]:
+        """
+        Run the optimisation for n steps and return the optimal flags after those steps
+        :param n_steps: The number of steps to run the simulation for
+        :param optimiser: The optimiser object that will be used to optimise the flags
+        :param benchmark_obj: The object for benchmarking
+        :return: The dictionary of flags and whether they were chosen or not
+        """
+        optimiser.n_steps_optimise(benchmark_obj, n_steps)
+        print('The optimisation process finished')
+        print(f"States Explored: {optimiser.states_explored}")
+        print(f"Fastest Time: {optimiser.fastest_time}s")
+        print(f"Fastest Flags: {create_flag_string(optimiser.fastest_flags)}")
 
     def anytime_optimisation(self,
                              optimiser: FlagOptimiser,
@@ -75,13 +68,12 @@ class FlagOptimisationController:
         return optimiser.continuous_optimise(benchmark_obj)
 
 
-#TODO move this behaviour into functions seperated by n-step and anytime optimisation
 #TODO have cli flags control which optimisation method and approach to use (default random search anytime algorithm)
 if __name__ == '__main__':
     SOURCE_CODE_FILE = os.path.join(constants.SOURCE_CODE_DIR, "BreadthFSSudoku.cpp")
     controller = FlagOptimisationController("binary_flags.txt", SOURCE_CODE_FILE)
     optimiser = RandomSearchOptimiser(controller.flags)
     benchmarker = Benchmarker(SOURCE_CODE_FILE)
-
     # Runs optimisation until user stops execution with ctrl+c
-    controller.anytime_optimisation(optimiser, benchmarker)
+    controller.n_times_optimisation(20, optimiser, benchmarker)
+    benchmarker.compare_with_o3(create_flag_string(optimiser.get_fastest_flags()))
