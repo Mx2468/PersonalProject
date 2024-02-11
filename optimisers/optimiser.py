@@ -33,6 +33,7 @@ class FlagOptimiser(ABC):
         """
         raise NotImplementedError
 
+    # TODO: Change the return type of this to list[list[str]] so that other optimisers can use it. Random search can use something else
     @abstractmethod
     def optimisation_step(cls, flags: dict[str, bool]) -> dict[str, bool]:
         """
