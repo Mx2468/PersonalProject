@@ -1,8 +1,7 @@
 """ A Module to run and control the running of the flag optimisation"""
 import os
 
-from optimisers.optimiser import FlagOptimiser
-from optimisers.random_search import RandomSearchOptimiser
+from optimisers import *
 import sys
 import signal
 
@@ -71,8 +70,11 @@ class FlagOptimisationController:
 if __name__ == '__main__':
     SOURCE_CODE_FILE = os.path.join(constants.SOURCE_CODE_DIR, "BreadthFSSudoku.cpp")
     controller = FlagOptimisationController("binary_flags.txt", SOURCE_CODE_FILE)
-    optimiser = RandomSearchOptimiser(controller.flags)
+    #optimiser = RandomSearchOptimiser(controller.flags)
+    optimiser = GeneticAlgorithmOptimiser(controller.flags, 4)
     benchmarker = Benchmarker(SOURCE_CODE_FILE)
+
+    print(optimiser.choose_from_population(benchmarker))
     # Runs optimisation until user stops execution with ctrl+c
-    controller.n_times_optimisation(20, optimiser, benchmarker)
-    benchmarker.compare_with_o3(create_flag_string(optimiser.get_fastest_flags()))
+    # controller.n_times_optimisation(20, optimiser, benchmarker)
+    # benchmarker.compare_with_o3(create_flag_string(optimiser.get_fastest_flags()))
