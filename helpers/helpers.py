@@ -3,6 +3,16 @@ A file with miscellaneous helper methods
 Currently only a flag string helper method
 """
 
+from random import getrandbits
+
+def get_random_flag_sample(flags: list[str]) -> dict[str, bool]:
+    """
+    Get a random sample from a set of binary flags
+    :param flags: A list of binary flags
+    :return: A dictionary of flags, along with if they were chosen or not
+    """
+    return {flag: bool(getrandbits(1)) for flag in flags}
+
 
 def create_flag_string(flag_choices: dict[str, bool]) -> str:
     """
