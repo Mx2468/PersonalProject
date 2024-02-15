@@ -1,5 +1,6 @@
 """ A class containing the benchmarking info and behaviour"""
-
+from itertools import islice, repeat
+from multiprocessing.pool import Pool
 from time import time
 import subprocess
 import os
@@ -10,20 +11,18 @@ DEFAULT_COMPILED_FILE_NAME = "filetotest"
 class Benchmarker:
     """A class containing the benchmarking info and behaviour"""
 
-    # Counter to create distinct file names
-    GLOBAL_COUNTER = 1
-
     def __init__(self, source_code_to_benchmark: str, compiled_file_name: str = DEFAULT_COMPILED_FILE_NAME):
         self.SOURCE_CODE_FILE = source_code_to_benchmark
         self.COMPILED_CODE_FILE = compiled_file_name
 
     def compile_with_flags(self,
                            output_file_name: str,
-                           opt_flag: str = "O0"):
+                           opt_flag: str = "O0") -> str:
         """Compile a c++ source code file with the specified flags"""
         subprocess.run(
             [f"g++ {opt_flag} -w -o {output_file_name} {self.SOURCE_CODE_FILE}"],
             shell=True, cwd=os.getcwd())
+        return output_file_name
 
 
     def benchmark_flag_choices(self,
@@ -42,10 +41,10 @@ class Benchmarker:
                     function_to_run: callable,
                     output_file_name: str) -> float:
         """For measuring time for a function to run"""
-        start = time()
-        for j in range(0, number_of_repetitions):
+        for j in range(number_of_repetitions):
+            start = time()
             function_to_run(output_file_name)
-        end = time()
+            end = time()
         # time.time returns time in seconds, so conversion is not needed
         return (end - start) / number_of_repetitions
 
@@ -69,3 +68,22 @@ class Benchmarker:
             print("These flags are better than O3!")
         else:
             print("These flags perform just as well or worse than O3")
+
+    @staticmethod
+    def generate_unique_outputfile_names(start: int, end: int):
+        for i in range(start, end):
+            yield ''.join([DEFAULT_COMPILED_FILE_NAME, str(i+1)])
+
+    def parallel_benchmark_flags(self, flag_string_to_benchmark: str, n_runs: int) -> float:
+        output_names = list(islice(self.generate_unique_outputfile_names(0, n_runs), n_runs))
+        with Pool(n_runs) as pool:
+            output_names = pool.starmap(self.compile_with_flags,
+                                        zip(output_names,
+                                            repeat(flag_string_to_benchmark, n_runs)))
+            print(output_names)
+            args_list = zip(list(repeat(1, n_runs)),
+                            list(repeat(self.run_compiled_code, n_runs)),
+                            output_names)
+            times = pool.starmap(self.time_needed, args_list)
+
+        return sum(times)/n_runs

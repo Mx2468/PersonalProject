@@ -5,7 +5,7 @@ from optimisers import *
 import sys
 import signal
 
-from helpers import create_flag_string, constants, Benchmarker
+from helpers import constants, Benchmarker
 from reader.binary_flag_reader import BinaryFlagReader
 
 
@@ -70,11 +70,10 @@ class FlagOptimisationController:
 if __name__ == '__main__':
     SOURCE_CODE_FILE = os.path.join(constants.SOURCE_CODE_DIR, "BreadthFSSudoku.cpp")
     controller = FlagOptimisationController("binary_flags.txt", SOURCE_CODE_FILE)
-    #optimiser = RandomSearchOptimiser(controller.flags)
     optimiser = GeneticAlgorithmOptimiser(controller.flags, 4)
     benchmarker = Benchmarker(SOURCE_CODE_FILE)
-
-    print(optimiser.choose_from_population(benchmarker))
     # Runs optimisation until user stops execution with ctrl+c
-    # controller.n_times_optimisation(20, optimiser, benchmarker)
+    # controller.n_times_optimisation(40, optimiser, benchmarker)
     # benchmarker.compare_with_o3(create_flag_string(optimiser.get_fastest_flags()))
+    random_flags = validate_flag_choices(get_random_flag_sample(controller.flags))
+    print(benchmarker.parallel_benchmark_flags(create_flag_string(random_flags), 10))
