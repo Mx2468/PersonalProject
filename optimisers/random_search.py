@@ -1,5 +1,5 @@
 """ A class used to implement a random search algorithm for optimising flags """
-from random import getrandbits
+import helpers
 from optimisers.optimiser import FlagOptimiser
 from helpers import validate_flag_choices, create_flag_string, Benchmarker
 
@@ -8,10 +8,9 @@ class RandomSearchOptimiser(FlagOptimiser):
     """ A class for random search optimisation of compiler flags"""
     def __init__(self, flags_to_optimise: list[str]):
         super().__init__(flags_to_optimise)
-        self.fastest_time = float('inf')
 
-    def optimisation_step(self, flags: dict[str, bool]):
-        return {flag: bool(getrandbits(1)) for flag in flags}
+    def optimisation_step(self, flags: dict[str, bool]) -> dict[str, bool]:
+        return validate_flag_choices(helpers.get_random_flag_sample(list(flags.keys())))
 
     def continuous_optimise(self, benchmark_obj: Benchmarker) -> dict[str, bool]:
         # Explores the state space until it is done (as part of an anytime algorithm)
@@ -61,6 +60,21 @@ class RandomSearchOptimiser(FlagOptimiser):
         flags_to_return = self.fastest_flags
         self.clear_between_runs()
         return flags_to_return
+    def n_steps_optimise(self, benchmarker: Benchmarker, n: int) -> dict[str, bool]:
+        for i in range(n):
+            self.current_flags = self.optimisation_step(self.current_flags)
+
+            current_time = benchmarker.benchmark_flag_choices(
+                opt_flag=create_flag_string(self.current_flags))
+
+            if self.fastest_time is None or current_time < self.fastest_time:
+                self.fastest_time = current_time
+                self.fastest_flags = self.current_flags
+
+            self.states_explored += 1
+
+        return self.fastest_flags
+
 
     def clear_between_runs(self):
         """ Clears all the lingering state in the class between optimisation runs """

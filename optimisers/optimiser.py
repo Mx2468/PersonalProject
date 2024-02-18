@@ -13,6 +13,7 @@ class FlagOptimiser(ABC):
     def __init__(self, flags: list[str]):
         self.fastest_flags = {flag: False for flag in flags}
         self.current_flags = {flag: False for flag in flags}
+        self.fastest_time = float('inf')
 
     @abstractmethod
     def continuous_optimise(self, benchmarker: Benchmarker) -> dict[str, bool]:
@@ -34,7 +35,7 @@ class FlagOptimiser(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def optimisation_step(cls, flags: dict[str, bool]) -> dict[str, bool]:
+    def optimisation_step(cls, flags: dict[str, bool]) -> dict[str, bool] | list[dict[str, bool]]:
         """
         Completes a step of the optimisation, returning the flags after the choice is made
         :param flags: A dictionary of flags and their on/off states to optimise
