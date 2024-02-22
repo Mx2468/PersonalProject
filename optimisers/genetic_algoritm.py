@@ -1,4 +1,3 @@
-#TODO implement a genetic algorithm optimiser class
 from multiprocessing.pool import Pool
 
 from helpers import get_random_flag_sample, Benchmarker, create_flag_string, validate_flag_choices
@@ -6,13 +5,19 @@ from optimisers.optimiser import FlagOptimiser
 import numpy as np
 
 class GeneticAlgorithmOptimiser(FlagOptimiser):
+
+    #TODO: Introduce and play around with elitism
+    #TODO: Automatically Seed -O3 flags
+    #TODO: Experiment with these current parameters (informed by research)
     MUTATION_RATE = 0.01
     MIXING_NUMBER = 2
     current_flags: list[dict[str, bool]] = []
     n_population: int = 2
     random_generator: np.random.Generator = np.random.default_rng()
 
-    def __init__(self, flags: list[str], n_population: int = 2):
+    def __init__(self, flags: list[str],
+                 n_population: int = 5,
+                 starting_population: list[dict[str, bool]] = None):
         """
 
         :param flags:
@@ -20,8 +25,17 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
         """
         super().__init__(flags)
         # Setup inital random population
+        print(starting_population)
         self.n_population = n_population
-        self.current_flags = [validate_flag_choices(get_random_flag_sample(list(flags))) for i in range(n_population)]
+        if starting_population is None:
+            self.current_flags = [validate_flag_choices(get_random_flag_sample(list(flags)))
+                                  for i in range(n_population)]
+        else:
+            self.current_flags = starting_population
+            flags_to_add = n_population - len(self.current_flags)
+            self.current_flags += [validate_flag_choices(get_random_flag_sample(list(flags)))
+                                   for i in range(flags_to_add)]
+
 
     def continuous_optimise(self, benchmarker: Benchmarker) -> dict[str, bool]:
         """
@@ -39,6 +53,8 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
                     self.fastest_flags = flag_comb
                     self.fastest_time = current_time
 
+        return self.fastest_flags
+
     def n_steps_optimise(self, benchmarker: Benchmarker, n: int) -> dict[str, bool]:
         """
         Optimise the flags for a certain number of optimisation steps
@@ -47,6 +63,7 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
         :return: The best flags after n optimisation steps
         """
         for i in range(n):
+            # TODO: This is shared between this and the other opt method - Refactor this into one function
             self.current_flags = self.optimisation_step(benchmarker)
             # Benchmark flags
             for flag_comb in self.current_flags:
@@ -86,8 +103,7 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
         """
         fitness_array = np.array([])
         for individual in self.current_flags:
-            individual_time = benchmarker.benchmark_flag_choices(
-                opt_flag=create_flag_string(individual))
+            individual_time = benchmarker.parallel_benchmark_flags(create_flag_string(individual), 3)
             # Get the reciprocal of the time taken to convert from smaller-is-better to bigger-is-better
             fitness = 1 / individual_time
             fitness_array = np.append(fitness_array, [fitness])
