@@ -8,6 +8,7 @@ import signal
 from helpers import constants, Benchmarker
 from reader.binary_flag_reader import BinaryFlagReader
 
+#TODO: refactor flags paths
 
 class FlagOptimisationController:
     """ A class to orchestrate and control the flag optimisation process"""
@@ -67,13 +68,23 @@ class FlagOptimisationController:
 
 
 #TODO have cli flags control which optimisation method and approach to use (default random search anytime algorithm)
+#TODO: Rename "n-step" optimisation to contract algorithm
+#TODO: Implement dumping of the flags to a file or stdout at the end of anytime optimisation
 if __name__ == '__main__':
     SOURCE_CODE_FILE = os.path.join(constants.SOURCE_CODE_DIR, "BreadthFSSudoku.cpp")
-    controller = FlagOptimisationController("binary_flags.txt", SOURCE_CODE_FILE)
-    optimiser = GeneticAlgorithmOptimiser(controller.flags, 4)
+    controller = FlagOptimisationController("flags/binary_flags.txt", SOURCE_CODE_FILE)
+
+    o3_flags: dict[str, bool] = None
+    with BinaryFlagReader("./flags/O3_flags.txt") as o3_flags_reader:
+        o3_flags_reader.read_in_flags()
+        o3_flags = o3_flags_reader.get_flags()
+    o3_flags_choice = {name: True for name in o3_flags}
+
+    optimiser = GeneticAlgorithmOptimiser(controller.flags, 4, [o3_flags_choice])
     benchmarker = Benchmarker(SOURCE_CODE_FILE)
     # Runs optimisation until user stops execution with ctrl+c
-    # controller.n_times_optimisation(40, optimiser, benchmarker)
-    # benchmarker.compare_with_o3(create_flag_string(optimiser.get_fastest_flags()))
-    random_flags = validate_flag_choices(get_random_flag_sample(controller.flags))
-    print(benchmarker.parallel_benchmark_flags(create_flag_string(random_flags), 10))
+    #controller.n_times_optimisation(20, optimiser, benchmarker)
+    controller.anytime_optimisation(optimiser, benchmarker)
+    benchmarker.compare_with_o3(create_flag_string(optimiser.get_fastest_flags()))
+    # random_flags = validate_flag_choices(get_random_flag_sample(controller.flags))
+    # print(benchmarker.parallel_benchmark_flags(create_flag_string(random_flags), 10))
