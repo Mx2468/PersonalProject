@@ -1,4 +1,6 @@
 """ A class containing the benchmarking info and behaviour"""
+import signal
+import sys
 from itertools import islice, repeat
 from multiprocessing.pool import Pool
 from time import time
@@ -7,9 +9,9 @@ import os
 
 DEFAULT_COMPILED_FILE_NAME = "filetotest"
 
-
 class Benchmarker:
     """A class containing the benchmarking info and behaviour"""
+    GLOBAL_COUNTER = 0
 
     def __init__(self, source_code_to_benchmark: str, compiled_file_name: str = DEFAULT_COMPILED_FILE_NAME):
         self.SOURCE_CODE_FILE = source_code_to_benchmark
@@ -32,9 +34,9 @@ class Benchmarker:
         Compiles a source file with given flag choices
         and returns the benchmark time of the compiled code
         """
-        new_name = self.get_fresh_file_name()
-        self.compile_with_flags(new_name, opt_flag)
-        return self.time_needed(number_of_runs, self.run_compiled_code, new_name)
+        # new_name = self.generate_unique_outputfile_names(0, number_of_runs-1)
+        self.compile_with_flags(self.COMPILED_CODE_FILE, opt_flag)
+        return self.time_needed(number_of_runs, self.run_compiled_code, self.COMPILED_CODE_FILE)
 
     @staticmethod
     def time_needed(number_of_repetitions: int,
@@ -74,16 +76,21 @@ class Benchmarker:
         for i in range(start, end):
             yield ''.join([DEFAULT_COMPILED_FILE_NAME, str(i+1)])
 
+    #TODO: Base this on the number of cores in a machine
     def parallel_benchmark_flags(self, flag_string_to_benchmark: str, n_runs: int) -> float:
         output_names = list(islice(self.generate_unique_outputfile_names(0, n_runs), n_runs))
         with Pool(n_runs) as pool:
+            # Compile each file with a unique output file name
             output_names = pool.starmap(self.compile_with_flags,
                                         zip(output_names,
                                             repeat(flag_string_to_benchmark, n_runs)))
-            print(output_names)
+            # Create the list of arguments to pass to self.time_needed
             args_list = zip(list(repeat(1, n_runs)),
                             list(repeat(self.run_compiled_code, n_runs)),
                             output_names)
+            # Run and benchmark the compiled files in parallel
             times = pool.starmap(self.time_needed, args_list)
+        for name in output_names:
+            os.remove(name)
 
         return sum(times)/n_runs
