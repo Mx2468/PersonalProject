@@ -1,5 +1,4 @@
 # Module to read in binary choice flags to optimise
-from os import read
 from reader.flag_file_reader import FlagFileReader
 
 
