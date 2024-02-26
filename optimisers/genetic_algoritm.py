@@ -11,21 +11,19 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
     #TODO: Experiment with these current parameters (informed by research)
     MUTATION_RATE = 0.01
     MIXING_NUMBER = 2
+    ELITISM_ENABLED = True
+    ELITISM_NUMBER_CARRIED = 1
     current_flags: list[dict[str, bool]] = []
-    n_population: int = 2
+    n_population: int = 5
     random_generator: np.random.Generator = np.random.default_rng()
 
     def __init__(self, flags: list[str],
                  n_population: int = 5,
-                 starting_population: list[dict[str, bool]] = None):
-        """
+                 starting_population: list[dict[str, bool]] = None, **kwargs):
+        #TODO: Document kwargs
 
-        :param flags:
-        :param n_population:
-        """
         super().__init__(flags)
         # Setup inital random population
-        print(starting_population)
         self.n_population = n_population
         if starting_population is None:
             self.current_flags = [validate_flag_choices(get_random_flag_sample(list(flags)))
@@ -36,6 +34,10 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
             self.current_flags += [validate_flag_choices(get_random_flag_sample(list(flags)))
                                    for i in range(flags_to_add)]
 
+        for argument in kwargs:
+            # TODO: Add error handling to check kwarg exists
+            setattr(self, argument, kwargs[argument])
+
 
     def continuous_optimise(self, benchmarker: Benchmarker) -> dict[str, bool]:
         """
@@ -45,13 +47,7 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
         """
         while self.states_explored < 2 ** len(self.current_flags[0].keys()):
             self.current_flags = self.optimisation_step(benchmarker)
-            # Benchmark flags
-            for flag_comb in self.current_flags:
-                current_time = benchmarker.benchmark_flag_choices(
-                    opt_flag=create_flag_string(flag_comb))
-                if current_time < self.fastest_time:
-                    self.fastest_flags = flag_comb
-                    self.fastest_time = current_time
+            self.evaluate_flags(benchmarker)
 
         return self.fastest_flags
 
@@ -65,15 +61,19 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
         for i in range(n):
             # TODO: This is shared between this and the other opt method - Refactor this into one function
             self.current_flags = self.optimisation_step(benchmarker)
-            # Benchmark flags
-            for flag_comb in self.current_flags:
-                current_time = benchmarker.benchmark_flag_choices(
-                    opt_flag=create_flag_string(flag_comb))
-                if current_time < self.fastest_time:
-                    self.fastest_flags = flag_comb
-                    self.fastest_time = current_time
+            self.evaluate_flags(benchmarker)
 
         return self.fastest_flags
+
+
+    def evaluate_flags(self, benchmarker: Benchmarker) -> None:
+        """ Evaluates the flags to find if the flags are better than before"""
+        for flag_comb in self.current_flags:
+            current_time = benchmarker.benchmark_flag_choices(
+                opt_flag=create_flag_string(flag_comb))
+            if current_time < self.fastest_time:
+                self.fastest_flags = flag_comb
+                self.fastest_time = current_time
 
     def optimisation_step(self, benchmarker: Benchmarker) -> list[dict[str, bool]]:
         """
@@ -81,19 +81,46 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
         :param flags: A dictionary of flags and their on/off states to optimise from
         :return: The flags suggested after the optimisation step
         """
-        next_population: list[dict[str, bool]] = []
-        for i in range(self.n_population):
-            # Apply fitness function (benchmark)
-            parents = self.choose_from_population(benchmarker)
-            # Reproduce offspring from parents
-            offspring = self.reproduce(*parents)
-            # Mutate at some small probabilities
-            mutated_offspring = self.mutate_individual(offspring)
-            next_population.append(validate_flag_choices(mutated_offspring))
-            self.states_explored += 1
-        self.states_explored += self.n_population
+        # Try-except statement used to prevent all current threads from printing the interrupt handling message
+        try:
+            next_population: list[dict[str, bool]] = []
 
-        return next_population
+            # Run benchmark on the individuals
+            fitness_array = self.get_fitness_of_population(benchmarker)
+
+            if self.ELITISM_ENABLED:
+                next_population = self.get_n_fastest_flags(fitness_array, self.ELITISM_NUMBER_CARRIED)
+
+            for i in range(self.n_population - len(next_population)):
+                # Apply fitness function (benchmark)
+                parents = self.choose_from_population(fitness_array)
+                # Reproduce offspring from parents
+                offspring = self.reproduce(*parents)
+                # Mutate at some small probabilities
+                mutated_offspring = self.mutate_individual(offspring)
+                next_population.append(validate_flag_choices(mutated_offspring))
+                self.states_explored += 1
+
+            self.states_explored += self.n_population
+
+            return next_population
+
+        except KeyboardInterrupt:
+            print("interrupted")
+
+    def get_n_fastest_flags(self, fitness_array: np.ndarray, n: int) -> list[dict[str, bool]]:
+        """
+        Select the n fastest current flags, as determined by a given set of fitness values
+        :param fitness_array: An array of fitness values, in the same order as self.current_flags
+        :param n: The number of flags to select
+        :return: A list of flag combinations
+        """
+        # Map flag choices to their fitness value
+        fitness_mapping = [(flag_comb, fitness) for flag_comb, fitness in zip(self.current_flags, fitness_array)]
+        sorted_by_value = sorted(fitness_mapping, key = lambda x: x[1], reverse=True)
+        n_fastest_flags = [k for k, v in sorted_by_value[:n]]
+        return n_fastest_flags
+
 
     def get_fitness_of_population(self, benchmarker: Benchmarker) -> np.ndarray:
         """
@@ -105,19 +132,18 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
         for individual in self.current_flags:
             individual_time = benchmarker.parallel_benchmark_flags(create_flag_string(individual), 3)
             # Get the reciprocal of the time taken to convert from smaller-is-better to bigger-is-better
-            fitness = 1 / individual_time
+            # Time+1 is used to deal with the case where time returns close to or == 0
+            fitness = 1 / (1+individual_time)
             fitness_array = np.append(fitness_array, [fitness])
         return fitness_array
 
-    def choose_from_population(self, benchmarker: Benchmarker) -> list[dict[str, bool]]:
+    def choose_from_population(self, fitness_array: np.ndarray) -> list[dict[str, bool]]:
         """
         Chooses parents from the population with a probability distribution
         corresponding to the fitness of the individuals
-        :param benchmarker:
-        :return:
+        :param benchmarker: The benchmarking object
+        :return: A list of individual flag choices to use as parents
         """
-        # Run benchmark on the individuals
-        fitness_array = self.get_fitness_of_population(benchmarker)
         # Normalise fitness function results
         normalised_fitness_array = fitness_array/np.sum(fitness_array)
         # Select with prob. dist. based on fitness function
