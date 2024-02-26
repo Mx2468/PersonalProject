@@ -1,22 +1,26 @@
-""" A Module to run and control the running of the flag optimisation"""
+"""A Module to run and control the running of the flag optimisation"""
 import os
-from core.flags import FlagChoices
+
 from optimisers import *
 import signal
 from helpers import constants, Benchmarker
 
 interrupted_handler_executed = False
 
-#TODO: refactor flags paths
+SOURCE_CODE_FILE = "./test_cases/BreadthFSSudoku.cpp"
 
 class FlagOptimisationController:
     """ A class to orchestrate and control the flag optimisation process"""
-    COMPILED_CODE_FILE = "filetotest"
-    flags: FlagChoices
+    flags: Flags
 
-    def __init__(self, flags_file: str, source_code_file: str, compiled_code_name: str = "filetotest"):
+    def __init__(self,
+                 binary_flags_file: str,
+                 domain_flags_file: str,
+                 source_code_file: str,
+                 compiled_code_name: str = constants.COMPILED_CODE_FILE):
         """
-        :param flags_file: The path to the file containing the flags
+        :param binary_flags_file: The path to the file containing the binary choice flags
+        :param domain_flags_file: The path to the file containing the domain choice flags
         :param source_code_file: The path to the source code to be compiled
         :param compiled_code_name: A path/name for the intermediate compiled executable file
         (not necessary for most uses - only if the environment rejects the default name)
@@ -24,14 +28,14 @@ class FlagOptimisationController:
         self.SOURCE_CODE_FILE = os.path.join(constants.SOURCE_CODE_DIR, source_code_file)
         self.COMPILED_CODE_FILE = compiled_code_name
 
-        # Currently only reads in binary flags
-        self.flags = FlagChoices([]).load_in_flags("flags/binary_flags.txt",
-                                      "flags/domain_flags.json")
+        flags_obj = Flags()
+        flags_obj.load_in_flags(binary_flags_file, domain_flags_file)
+        self.flags = flags_obj
 
     def n_times_optimisation(self,
                              n_steps: int,
                              optimiser: FlagOptimiser,
-                             benchmark_obj: Benchmarker) -> FlagChoices:
+                             benchmark_obj: Benchmarker) -> dict[str, bool]:
         """
         Run the optimisation for n steps and return the optimal flags after those steps
         :param n_steps: The number of steps to run the simulation for
@@ -77,19 +81,17 @@ class FlagOptimisationController:
 #TODO: Rename "n-step" optimisation to contract algorithm
 #TODO: Implement dumping of the flags to a file or stdout at the end of anytime optimisation
 #TODO: Implement proper handling of domain flags
-    #TODO: Implement validation of domain flags
+#TODO: Change as many class attributes as possible to private
 if __name__ == '__main__':
-    SOURCE_CODE_FILE = os.path.join(constants.SOURCE_CODE_DIR, "BreadthFSSudoku.cpp")
-    controller = FlagOptimisationController("flags/binary_flags.txt", SOURCE_CODE_FILE)
+    # SOURCE_CODE_FILE = os.path.join(constants.SOURCE_CODE_DIR, "BreadthFSSudoku.cpp")
+    controller = FlagOptimisationController("flags/binary_flags.txt",
+                                            "flags/domain_flags.json",
+                                            SOURCE_CODE_FILE)
 
-    # o3_flags: dict[str, bool] = None
-    # with BinaryFlagReader("./flags/O3_flags.txt") as o3_flags_reader:
-    #     o3_flags_reader.read_in_flags()
-    #     o3_flags = o3_flags_reader.get_flags()
-    # o3_flags_choice = {name: True for name in o3_flags}
-
+    benchmarker = Benchmarker(SOURCE_CODE_FILE)
+    random_flags = validate_flag_choices(get_random_flag_sample(controller.flags))
+    default_flag_str = create_flag_string(random_flags)
+    benchmarker.compare_with_o3(default_flag_str)
 
     # optimiser = GeneticAlgorithmOptimiser(controller.flags, 10, [o3_flags_choice])
-    # benchmarker = Benchmarker(SOURCE_CODE_FILE)
     # controller.anytime_optimisation(optimiser, benchmarker)
-    # benchmarker.compare_with_o3(create_flag_string(optimiser.get_fastest_flags()))
