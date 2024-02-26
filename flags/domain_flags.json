@@ -7,16 +7,12 @@
                 "skip",
                 "used",
                 "all",
-                "leafy",
                 "used-gpr",
                 "all-gpr",
-                "leafy-gpr",
                 "used-arg",
                 "all-arg",
-                "leafy-arg",
                 "used-gpr-arg",
-                "all-gpr-arg",
-                "leafy-gpr-arg"
+                "all-gpr-arg"
             ],
             "default": "skip"
         },
@@ -72,7 +68,7 @@
         },
 
         {
-            "flagname": "-fsched-stalled-insns-dep",
+            "flagname": "-flive-patching",
             "domaintype": "Choice",
             "choices": [
                 "inline-clone",
@@ -93,7 +89,7 @@
             "choices": [
                 "uninitialized",
                 "pattern",
-                "zeto"
+                "zero"
             ],
             "default": "uninitialized"
         },
