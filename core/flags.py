@@ -6,7 +6,9 @@ class Flags:
     domain_flag_defaults: dict[str, str]
 
     def __init__(self):
-        pass
+        self.all_flag_names = []
+        self.flag_domains = {}
+        self.domain_flag_default = {}
 
     def load_in_flags(self, binary_flag_path: str, domain_flag_path: str) -> None:
         """
@@ -23,7 +25,11 @@ class Flags:
         with domain_flag_reader.DomainFlagReader(domain_flag_path) as domain_reader:
             domain_reader.read_in_flags()
             self.all_flag_names += domain_reader.get_flags()
-            self.domain_flag_defaults= domain_reader.get_default_values()
+            self.domain_flag_defaults = domain_reader.get_default_values()
+
+        flag_domain_mapping = domain_reader.get_domains()
+        for flag_name, domain in flag_domain_mapping.items():
+          self.flag_domains[flag_name] = domain
 
     def get_all_flag_names(self) -> list[str]:
         """Returns a list of all the flag names"""
