@@ -1,12 +1,9 @@
 """ A Module to run and control the running of the flag optimisation"""
 import os
-
+from core.flags import FlagChoices
 from optimisers import *
-import sys
 import signal
-
 from helpers import constants, Benchmarker
-from reader.binary_flag_reader import BinaryFlagReader
 
 interrupted_handler_executed = False
 
@@ -15,6 +12,7 @@ interrupted_handler_executed = False
 class FlagOptimisationController:
     """ A class to orchestrate and control the flag optimisation process"""
     COMPILED_CODE_FILE = "filetotest"
+    flags: FlagChoices
 
     def __init__(self, flags_file: str, source_code_file: str, compiled_code_name: str = "filetotest"):
         """
@@ -27,14 +25,13 @@ class FlagOptimisationController:
         self.COMPILED_CODE_FILE = compiled_code_name
 
         # Currently only reads in binary flags
-        with BinaryFlagReader(flags_file) as flag_reader:
-            flag_reader.read_in_flags()
-            self.flags = flag_reader.get_flags()
+        self.flags = FlagChoices([]).load_in_flags("flags/binary_flags.txt",
+                                      "flags/domain_flags.json")
 
     def n_times_optimisation(self,
                              n_steps: int,
                              optimiser: FlagOptimiser,
-                             benchmark_obj: Benchmarker) -> dict[str, bool]:
+                             benchmark_obj: Benchmarker) -> FlagChoices:
         """
         Run the optimisation for n steps and return the optimal flags after those steps
         :param n_steps: The number of steps to run the simulation for
@@ -85,17 +82,14 @@ if __name__ == '__main__':
     SOURCE_CODE_FILE = os.path.join(constants.SOURCE_CODE_DIR, "BreadthFSSudoku.cpp")
     controller = FlagOptimisationController("flags/binary_flags.txt", SOURCE_CODE_FILE)
 
-    o3_flags: dict[str, bool] = None
-    with BinaryFlagReader("./flags/O3_flags.txt") as o3_flags_reader:
-        o3_flags_reader.read_in_flags()
-        o3_flags = o3_flags_reader.get_flags()
-    o3_flags_choice = {name: True for name in o3_flags}
+    # o3_flags: dict[str, bool] = None
+    # with BinaryFlagReader("./flags/O3_flags.txt") as o3_flags_reader:
+    #     o3_flags_reader.read_in_flags()
+    #     o3_flags = o3_flags_reader.get_flags()
+    # o3_flags_choice = {name: True for name in o3_flags}
 
-    optimiser = GeneticAlgorithmOptimiser(controller.flags, 10, [o3_flags_choice])
-    benchmarker = Benchmarker(SOURCE_CODE_FILE)
-    # Runs optimisation until user stops execution with ctrl+c
-    #controller.n_times_optimisation(20, optimiser, benchmarker)
-    controller.anytime_optimisation(optimiser, benchmarker)
-    benchmarker.compare_with_o3(create_flag_string(optimiser.get_fastest_flags()))
-    # random_flags = validate_flag_choices(get_random_flag_sample(controller.flags))
-    # print(benchmarker.parallel_benchmark_flags(create_flag_string(random_flags), 10))
+
+    # optimiser = GeneticAlgorithmOptimiser(controller.flags, 10, [o3_flags_choice])
+    # benchmarker = Benchmarker(SOURCE_CODE_FILE)
+    # controller.anytime_optimisation(optimiser, benchmarker)
+    # benchmarker.compare_with_o3(create_flag_string(optimiser.get_fastest_flags()))
