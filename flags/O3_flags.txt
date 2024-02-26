@@ -77,7 +77,6 @@
 -foptimize-strlen
 -fpartial-inlining
 -fpeephole2
--freorder-blocks-algorithm=stc
 -freorder-blocks-and-partition
 -freorder-functions
 -frerun-cse-after-loop
@@ -95,7 +94,6 @@
 -ftree-switch-conversion
 -ftree-tail-merge
 -ftree-vrp
--fvect-cost-model=very-cheap
 -fgcse-after-reload
 -fipa-cp-clone
 -floop-interchange
@@ -107,5 +105,4 @@
 -ftree-loop-distribution
 -ftree-partial-pre
 -funswitch-loops
--fvect-cost-model=dynamic
 -fversion-loops-for-strides

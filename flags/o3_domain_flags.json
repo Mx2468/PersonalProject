@@ -1,0 +1,21 @@
+{
+  "flags": [
+      {
+        "flagname": "-freorder-blocks-algorithm",
+        "domaintype": "Choice",
+        "choices": [
+          "stc"
+        ],
+        "default": "simple"
+      },
+
+      {
+      "flagname": "-fvect-cost-model",
+      "domaintype": "Choice",
+      "choices": [
+          "dynamic"
+      ],
+      "default": "dynamic"
+  }
+  ]
+}
