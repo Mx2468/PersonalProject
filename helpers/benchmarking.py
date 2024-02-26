@@ -1,6 +1,4 @@
 """ A class containing the benchmarking info and behaviour"""
-import signal
-import sys
 from itertools import islice, repeat
 from multiprocessing.pool import Pool
 from time import time
