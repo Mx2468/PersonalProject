@@ -3,10 +3,13 @@ from reader.flag_file_reader import FlagFileReader
 
 class DomainFlagReader(FlagFileReader):
     all_names: list[str]
-    domains: dict[str, str]
+    domains: dict[str, str|list[str]]
     defaults: dict[str, str]
     def __init__(self, file_name: str):
         super().__init__(file_name)
+        self.all_names = []
+        self.domains = {}
+        self.defaults = {}
 
     def read_in_flags(self) -> None:
         """Read the domain flags, their domains, and the default choices"""
@@ -28,7 +31,7 @@ class DomainFlagReader(FlagFileReader):
     def get_flags(self) -> list[str]:
         return self.all_names
 
-    def get_domains(self) -> dict[str, str]:
+    def get_domains(self) -> dict[str, str|list[str]]:
         return self.domains
 
     def get_default_values(self) -> dict[str, str]:
