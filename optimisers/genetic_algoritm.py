@@ -1,13 +1,10 @@
-from multiprocessing.pool import Pool
-
+from core.flags import Flags
 from helpers import get_random_flag_sample, Benchmarker, create_flag_string, validate_flag_choices
 from optimisers.optimiser import FlagOptimiser
 import numpy as np
 
 class GeneticAlgorithmOptimiser(FlagOptimiser):
 
-    #TODO: Introduce and play around with elitism
-    #TODO: Automatically Seed -O3 flags
     #TODO: Experiment with these current parameters (informed by research)
     MUTATION_RATE = 0.01
     MIXING_NUMBER = 2
@@ -16,17 +13,22 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
     current_flags: list[dict[str, bool]] = []
     n_population: int = 5
     random_generator: np.random.Generator = np.random.default_rng()
+    flags_object: Flags
 
-    def __init__(self, flags: list[str],
+    # TODO: Change to load in flag domains from FlagChoices Object
+    def __init__(self,
+                 flags_to_optimise: Flags,
                  n_population: int = 5,
-                 starting_population: list[dict[str, bool]] = None, **kwargs):
+                 starting_population: list[dict[str, bool]] = None,
+                 **kwargs):
         #TODO: Document kwargs
-
-        super().__init__(flags)
-        # Setup inital random population
+        super().__init__(flags_to_optimise.get_all_flag_names())
+        # Setup initial random population
+        self.flags_object = flags_to_optimise
         self.n_population = n_population
         if starting_population is None:
-            self.current_flags = [validate_flag_choices(get_random_flag_sample(list(flags)))
+            self.current_flags = [validate_flag_choices(
+                get_random_flag_sample(flags))
                                   for i in range(n_population)]
         else:
             self.current_flags = starting_population
@@ -59,7 +61,6 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
         :return: The best flags after n optimisation steps
         """
         for i in range(n):
-            # TODO: This is shared between this and the other opt method - Refactor this into one function
             self.current_flags = self.optimisation_step(benchmarker)
             self.evaluate_flags(benchmarker)
 
@@ -172,6 +173,7 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
         """
         for key in individual.keys():
             if self.random_generator.uniform() < self.MUTATION_RATE:
+                # TODO: Change this to choose from domain (but leave negation for binary flags)
                 individual[key] = not individual[key]
 
         return individual
