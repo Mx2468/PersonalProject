@@ -8,6 +8,8 @@ import signal
 from helpers import constants, Benchmarker
 from reader.binary_flag_reader import BinaryFlagReader
 
+interrupted_handler_executed = False
+
 #TODO: refactor flags paths
 
 class FlagOptimisationController:
@@ -57,19 +59,28 @@ class FlagOptimisationController:
         :return The dictionary of flags and whether they were chosen or not
         """
         def return_results(*args) -> None:
-            print('You pressed ^C!')
-            print(f"States Explored: {optimiser.states_explored}")
-            print(f"Fastest Time: {optimiser.fastest_time}s")
-            print(f"Fastest Flags: {create_flag_string(optimiser.fastest_flags)}")
-            sys.exit(0)
+            # Global variable used between threads to make sure this message is only printed once
+            # (i.e. by only one thread)
+            global interrupted_handler_executed
+            if not interrupted_handler_executed:
+                interrupted_handler_executed = True
+                print('You pressed ^C!')
+                print(f"States Explored: {optimiser.states_explored}")
+                print(f"Fastest Time: {optimiser.fastest_time}s")
+                print(f"Fastest Flags: {create_flag_string(optimiser.fastest_flags)}")
 
         signal.signal(signal.SIGINT, return_results)
         return optimiser.continuous_optimise(benchmark_obj)
 
 
+    def dump_flags(self, filename: str) -> None:
+        pass
+
 #TODO have cli flags control which optimisation method and approach to use (default random search anytime algorithm)
 #TODO: Rename "n-step" optimisation to contract algorithm
 #TODO: Implement dumping of the flags to a file or stdout at the end of anytime optimisation
+#TODO: Implement proper handling of domain flags
+    #TODO: Implement validation of domain flags
 if __name__ == '__main__':
     SOURCE_CODE_FILE = os.path.join(constants.SOURCE_CODE_DIR, "BreadthFSSudoku.cpp")
     controller = FlagOptimisationController("flags/binary_flags.txt", SOURCE_CODE_FILE)
@@ -80,7 +91,7 @@ if __name__ == '__main__':
         o3_flags = o3_flags_reader.get_flags()
     o3_flags_choice = {name: True for name in o3_flags}
 
-    optimiser = GeneticAlgorithmOptimiser(controller.flags, 4, [o3_flags_choice])
+    optimiser = GeneticAlgorithmOptimiser(controller.flags, 10, [o3_flags_choice])
     benchmarker = Benchmarker(SOURCE_CODE_FILE)
     # Runs optimisation until user stops execution with ctrl+c
     #controller.n_times_optimisation(20, optimiser, benchmarker)
