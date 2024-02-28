@@ -34,7 +34,6 @@ def get_random_flag_sample(flags: Flags) -> dict[str, bool|str]:
                 # For now - just use a random integer
                 flag_choices[flag_name] = get_random_integer()
             case [*domain_values]:
-                # print(f"flag {flag_name} has choices: {domain_values}")
                 flag_choices[flag_name] = choice(domain_values)
             case _ :
                 raise ValueError(f"Unrecognised flag domain {domain} for flag {flag_name}")
