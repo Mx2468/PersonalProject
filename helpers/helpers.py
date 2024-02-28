@@ -18,7 +18,6 @@ def get_random_flag_sample(flags: Flags) -> dict[str, bool|str]:
     :param flags: A list of binary flags
     :return: A dictionary of flags, along with if they were chosen or not
     """
-    # TODO: Change this to handle domain flags
     flag_choices = {}
     for flag_name in flags.get_all_flag_names():
         domain = flags.get_flag_domain(flag_name)
@@ -51,7 +50,6 @@ def create_flag_string(flag_choices: dict[str, bool|str]) -> str:
 
     :return: A string of compiler flags in the format to run the compilation
     """
-    # TODO: Change this to handle domains properly
     final_str = ""
     for flag_name, choice in flag_choices.items():
         if isinstance(choice, bool):
