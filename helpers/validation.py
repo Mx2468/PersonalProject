@@ -42,7 +42,7 @@ def validate_live_patching_issues(flag_choices: dict[str, bool|str|list[str]]) \
 
     # Disable live patching if it interferes with any of the more useful flags
     if inline_clone_clash or inline_only_static_clash:
-        flag_choices["-flive-patching"] = False
+        del flag_choices["-flive-patching"]
     elif not inline_clone_clash and not inline_only_static_clash:
         flag_choices["-flive-patching"] = "inline-only-static"
     elif not inline_clone_clash:
