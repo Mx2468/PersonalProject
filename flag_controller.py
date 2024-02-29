@@ -1,5 +1,6 @@
 """A Module to run and control the running of the flag optimisation"""
 import os
+import sys
 
 from optimisers import *
 import signal
@@ -7,7 +8,6 @@ from helpers import constants, Benchmarker
 
 interrupted_handler_executed = False
 
-SOURCE_CODE_FILE = "./test_cases/BreadthFSSudoku.cpp"
 
 class FlagOptimisationController:
     """ A class to orchestrate and control the flag optimisation process"""
@@ -48,6 +48,7 @@ class FlagOptimisationController:
         print(f"States Explored: {optimiser.states_explored}")
         print(f"Fastest Time: {optimiser.fastest_time}s")
         print(f"Fastest Flags: {create_flag_string(optimiser.fastest_flags)}")
+        return optimiser.fastest_flags
 
     def anytime_optimisation(self,
                              optimiser: FlagOptimiser,
@@ -80,18 +81,31 @@ class FlagOptimisationController:
 #TODO have cli flags control which optimisation method and approach to use (default random search anytime algorithm)
 #TODO: Rename "n-step" optimisation to contract algorithm
 #TODO: Implement dumping of the flags to a file or stdout at the end of anytime optimisation
-#TODO: Implement proper handling of domain flags
 #TODO: Change as many class attributes as possible to private
 if __name__ == '__main__':
-    # SOURCE_CODE_FILE = os.path.join(constants.SOURCE_CODE_DIR, "BreadthFSSudoku.cpp")
+    SOURCE_CODE_FILE = os.path.join(constants.SOURCE_CODE_DIR, "BreadthFSSudoku.cpp")
     controller = FlagOptimisationController("flags/binary_flags.txt",
                                             "flags/domain_flags.json",
                                             SOURCE_CODE_FILE)
 
     benchmarker = Benchmarker(SOURCE_CODE_FILE)
-    random_flags = validate_flag_choices(get_random_flag_sample(controller.flags))
-    default_flag_str = create_flag_string(random_flags)
-    benchmarker.compare_with_o3(default_flag_str)
 
-    # optimiser = GeneticAlgorithmOptimiser(controller.flags, 10, [o3_flags_choice])
-    # controller.anytime_optimisation(optimiser, benchmarker)
+
+    o3_flags_obj = Flags()
+    o3_flags_obj.load_in_flags("./flags/O3_flags.txt", "./flags/domain_flags.json")
+
+    # TODO: Implement a reader to load these flags in as true/their default values as provided to allow them to be used directly
+    o3_flags = {bin_flag: True for bin_flag in o3_flags_obj.get_all_flag_names()}
+    for domain_flag, value in o3_flags_obj.get_domain_flag_defaults().items():
+        o3_flags[domain_flag] = value
+    for flag in controller.flags.get_all_flag_names():
+        if not (flag in o3_flags.keys()):
+            o3_flags[flag] = False
+
+    o3_flags = validate_flag_choices(o3_flags)
+    # print(f"o3_flags: {o3_flags}")
+    # sys.exit(0)
+
+    optimiser = GeneticAlgorithmOptimiser(controller.flags, 4, [o3_flags])
+    controller.anytime_optimisation(optimiser, benchmarker)
+    benchmarker.compare_with_o3(create_flag_string(optimiser.get_fastest_flags()))
