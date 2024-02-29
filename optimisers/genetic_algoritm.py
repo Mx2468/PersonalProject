@@ -1,5 +1,6 @@
 from core.flags import Flags
-from helpers import get_random_flag_sample, Benchmarker, create_flag_string, validate_flag_choices
+from helpers import get_random_flag_sample, Benchmarker, create_flag_string, validate_flag_choices, \
+    get_random_integer
 from optimisers.optimiser import FlagOptimiser
 import numpy as np
 
@@ -19,21 +20,21 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
     def __init__(self,
                  flags_to_optimise: Flags,
                  n_population: int = 5,
-                 starting_population: list[dict[str, bool]] = None,
+                 starting_population: list[dict[str, bool|str]] = None,
                  **kwargs):
         #TODO: Document kwargs
         super().__init__(flags_to_optimise.get_all_flag_names())
         # Setup initial random population
         self.flags_object = flags_to_optimise
         self.n_population = n_population
+
         if starting_population is None:
-            self.current_flags = [validate_flag_choices(
-                get_random_flag_sample(flags))
+            self.current_flags = [validate_flag_choices(get_random_flag_sample(self.flags_object))
                                   for i in range(n_population)]
         else:
             self.current_flags = starting_population
             flags_to_add = n_population - len(self.current_flags)
-            self.current_flags += [validate_flag_choices(get_random_flag_sample(list(flags)))
+            self.current_flags += [validate_flag_choices(get_random_flag_sample(self.flags_object))
                                    for i in range(flags_to_add)]
 
         for argument in kwargs:
@@ -154,18 +155,18 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
                                                           p=normalised_fitness_array)
         return population_choices.tolist()
 
-    def reproduce(self, *parents: dict[str, bool]) -> dict[str, bool]:
+    def reproduce(self, *parents: dict[str, bool|str]) -> dict[str, bool|str]:
         """
         Creates an offspring individual given two parent inputs
         :param parents: The number of parents to reproduce
         :return: An "offspring" set of flag choices reproduced from the two input parents
         """
         # Sample choices randomly from each parent
-        child = {key: self.random_generator.choice(a=list(parents), size=1)[0]
+        child = {key: self.random_generator.choice(a=[parent[key] for parent in parents], size=1)[0]
                  for key in parents[0].keys()}
         return child
 
-    def mutate_individual(self, individual: dict[str, bool]) -> dict[str, bool]:
+    def mutate_individual(self, individual: dict[str, bool|str]) -> dict[str, bool|str]:
         """
         Mutates an individual set of flag choices with a random small probability
         :param individual: The flag choices to randomly mutate
@@ -173,11 +174,19 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
         """
         for key in individual.keys():
             if self.random_generator.uniform() < self.MUTATION_RATE:
-                # TODO: Change this to choose from domain (but leave negation for binary flags)
-                individual[key] = not individual[key]
+                if self.flags_object.get_flag_domain(key) == [True, False]:
+                    individual[key] = not individual[key]
+                else:
+                    domain_to_choose_from = self.flags_object.get_flag_domain(key)
+                    if type(domain_to_choose_from) == list:
+                        domain_to_choose_from.remove(individual[key])
+                        individual[key] = self.random_generator.choice(a = domain_to_choose_from, size=1)
+                    else:
+                        # If the domain is not is not a list of choices - it is an integer
+                        individual[key] = self.random_generator.choice(a = get_random_integer(), size=1)
 
         return individual
 
-    def get_fastest_flags(self) -> list[dict[str, bool]]:
+    def get_fastest_flags(self) -> dict[str, bool]:
         """Returns the current fastest flags of the optimiser"""
         return self.fastest_flags
