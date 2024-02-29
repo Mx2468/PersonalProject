@@ -50,9 +50,9 @@ def create_flag_string(flag_choices: dict[str, bool|str]) -> str:
     :return: A string of compiler flags in the format to run the compilation
     """
     final_str = ""
-    for flag_name, choice in flag_choices.items():
-        if isinstance(choice, bool):
-            if choice:
+    for flag_name, flag_choice in flag_choices.items():
+        if flag_choice == True or flag_choice == False:
+            if flag_choice:
                 final_str += f"{flag_name} "
             else:
                 # Case where the flag is not chosen
