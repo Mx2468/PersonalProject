@@ -4,21 +4,33 @@ from random import randint
 
 #TODO: Implement validation of domain flags
 def validate_flag_choices(flag_choices: dict[str, bool | str | list[str]]) -> dict[str, bool | str | list[str]]:
-
     flag_choices = validate_live_patching_issues(flag_choices)
+    flag_choices = validate_link_time_optimisation_flags(flag_choices)
 
     # Not supported by my configuration
     if "-fkeep-inline-dllexport" in flag_choices.keys():
         del flag_choices["-fkeep-inline-dllexport"]
 
+    flag_choices["-fsection-anchors"] = flag_choices["-ftoplevel-reorder"] = flag_choices["-funit-at-a-time"] # Needs to be the same as the others
+
+    return flag_choices
+
+def validate_link_time_optimisation_flags(flag_choices: dict[str, bool | str | list[str]]) -> dict[str, bool | str | list[str]]:
     # Make sure compression level is in the right bounds
     flto_compression_level = int(flag_choices["-flto-compression-level"])
     if flto_compression_level < 0 or flto_compression_level > 19:
         flag_choices["-flto-compression-level"] = str(randint(0, 19))
 
-    flag_choices["-fsection-anchors"] = flag_choices["-ftoplevel-reorder"] = flag_choices["-funit-at-a-time"] # Needs to be the same as the others
-
+    if flag_choices["-ffat-lto-objects"] == False:
+        # Not using fat lto objects requires a linker with linker plugin support:
+        # '-fno-fat-lto-objects improves compilation time over plain LTO,
+        # but requires the complete toolchain to be aware of LTO.
+        # It requires a linker with linker plugin support for basic functionality'
+        # Therefore, fat LTO objects are automatically enabled for
+        # compatibility with more enviromnents
+        flag_choices["-ffat-lto-objects"] = True
     return flag_choices
+
 
 def validate_live_patching_issues(flag_choices: dict[str, bool|str|list[str]]) \
         -> dict[str, bool|str|list[str]]:
@@ -30,8 +42,8 @@ def validate_live_patching_issues(flag_choices: dict[str, bool|str|list[str]]) \
     "inline-only-static" is more restrictive in the flags it allows than "inline-clone".
     """
     inline_clone_disabled_flags = ["-fwhole-program", "-fipa-pta", "-fipa-reference", "-fipa-ra",
-        "-fipa-icf", "-fipa-icf-functions", "-fipa-icf-variables", "-fipa-bit-cp",  "-fipa-vrp",
-        "-fipa-pure-const", "-fipa-reference-addressable", "-fipa-stack-alignment", "-fipa-modref"]
+        "-fipa-icf", "-fipa-bit-cp",  "-fipa-vrp", "-fipa-pure-const", "-fipa-reference-addressable",
+        "-fipa-stack-alignment", "-fipa-modref"]
 
     inline_only_static_disabled_flags = ["-fipa-cp-clone", "-fipa-sra", "-fpartial-inlining", "-fipa-cp"]
 
@@ -42,7 +54,8 @@ def validate_live_patching_issues(flag_choices: dict[str, bool|str|list[str]]) \
 
     # Disable live patching if it interferes with any of the more useful flags
     if inline_clone_clash or inline_only_static_clash:
-        del flag_choices["-flive-patching"]
+        if "-flive-patching" in flag_choices.keys():
+            del flag_choices["-flive-patching"]
     elif not inline_clone_clash and not inline_only_static_clash:
         flag_choices["-flive-patching"] = "inline-only-static"
     elif not inline_clone_clash:
