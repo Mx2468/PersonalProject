@@ -197,13 +197,7 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
                 if self.flags_object.get_flag_domain(key) == [True, False]:
                     individual[key] = not individual[key]
                 else:
-                    domain_to_choose_from = self.flags_object.get_flag_domain(key)
-                    if type(domain_to_choose_from) == list:
-                        domain_to_choose_from.remove(individual[key])
-                        individual[key] = self.random_generator.choice(a = domain_to_choose_from, size=1)
-                    else:
-                        # If the domain is not is not a list of choices - it is an integer
-                        individual[key] = self.random_generator.choice(a = get_random_integer(), size=1)
+                    individual[key] = get_random_individual_flag_choice(self.flags_object, key)
 
         return individual
 
