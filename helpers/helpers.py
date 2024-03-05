@@ -20,23 +20,30 @@ def get_random_flag_sample(flags: Flags) -> dict[str, bool|str]:
     """
     flag_choices = {}
     for flag_name in flags.get_all_flag_names():
-        domain = flags.get_flag_domain(flag_name)
-        match domain:
-            case "Integer":
-                flag_choices[flag_name] = get_random_integer()
-            case "Integer-or-binary":
-                use_integer = bool(getrandbits(1))
-                if use_integer:
-                    flag_choices[flag_name] = get_random_integer()
-                else:
-                    flag_choices[flag_name] = bool(getrandbits(1))
-            case "Integer-align":
-                # For now - just use a random integer
-                flag_choices[flag_name] = get_random_integer()
-            case [*domain_values]:
-                flag_choices[flag_name] = choice(domain_values)
-            case _ :
-                raise ValueError(f"Unrecognised flag domain {domain} for flag {flag_name}")
+        flag_choices[flag_name] = get_random_individual_flag_choice(flags, flag_name)
+    return flag_choices
+
+def get_random_individual_flag_choice(flags_obj: Flags, flag_name: str):
+    domain = flags_obj.get_flag_domain(flag_name)
+    match domain:
+        case "Integer":
+            return get_random_integer()
+        case "Integer-or-binary":
+            use_integer = bool(getrandbits(1))
+            if use_integer:
+                return get_random_integer()
+            else:
+                return bool(getrandbits(1))
+        case "Integer-align":
+            # For now - just use a random integer
+            return get_random_integer()
+        case [*domain_values]:
+            if flag_name == "-flive-patching":
+                domain_values += [False]
+                return choice(domain_values)
+            return choice(domain_values)
+        case _:
+            raise ValueError(f"Unrecognised flag domain {domain} for flag {flag_name}")
 
     return flag_choices
 
