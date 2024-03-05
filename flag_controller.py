@@ -102,6 +102,12 @@ class FlagOptimisationController:
     def dump_flags(self, filename: str) -> None:
         pass
 
+    def dump_flags(self, filename: str, flags: dict[str, bool|str]) -> None:
+        with open(filename, 'w') as file_obj:
+            for flag_name, value in flags.items():
+                file_obj.write(f"{flag_name}={value}\n")
+
+#TODO: "-fsched-stalled-insns" has an invalid value presented to it
 #TODO have cli flags control which optimisation method and approach to use (default random search anytime algorithm)
 #TODO: Rename "n-step" optimisation to contract algorithm
 #TODO: Implement dumping of the flags to a file or stdout at the end of anytime optimisation
