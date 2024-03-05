@@ -45,9 +45,6 @@ def get_random_individual_flag_choice(flags_obj: Flags, flag_name: str):
         case _:
             raise ValueError(f"Unrecognised flag domain {domain} for flag {flag_name}")
 
-    return flag_choices
-
-
 def create_flag_string(flag_choices: dict[str, bool|str]) -> str:
     """
     Creates a string of compiler flags that can be used to run the compiler
