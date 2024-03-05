@@ -5,6 +5,8 @@ from time import time
 import subprocess
 import os
 
+from helpers.constants import N_BENCHMARK_RUNS
+
 DEFAULT_COMPILED_FILE_NAME = "filetotest"
 
 class Benchmarker:
@@ -30,7 +32,7 @@ class Benchmarker:
 
     def benchmark_flag_choices(self,
                                opt_flag: str = "-O0",
-                               number_of_runs: int = 3) -> float:
+                               number_of_runs: int = N_BENCHMARK_RUNS) -> float:
         """
         Compiles a source file with given flag choices
         and returns the benchmark time of the compiled code
