@@ -155,15 +155,28 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
                                                           p=normalised_fitness_array)
         return population_choices.tolist()
 
-    def reproduce(self, *parents: dict[str, bool|str]) -> dict[str, bool|str]:
+    def reproduce(self, *parents: dict[str, bool | str]) -> dict[str, bool | str]:
         """
         Creates an offspring individual given two parent inputs
         :param parents: The number of parents to reproduce
         :return: An "offspring" set of flag choices reproduced from the two input parents
         """
-        # Sample choices randomly from each parent
-        child = {key: self.random_generator.choice(a=[parent[key] for parent in parents], size=1)[0]
-                 for key in parents[0].keys()}
+        n_parents = len(parents)
+        n_flags = len(parents[0])
+        # Get a set of random crossover points, from 1 to the number of flags
+        # They then get ordered to be used
+        crossovers = sorted(sample(range(1, n_flags), n_parents - 1))
+
+        child = {}
+        last_point = 0
+        for i, crossover in enumerate(crossovers):
+            keys = list(parents[i].keys())[last_point:crossover]
+            for key in keys:
+                child[key] = parents[i][key]
+
+        # Add last bit of flags
+        for key in list(parents[-1].keys())[last_point:n_flags]:
+            child[key] = parents[-1][key]
         return child
 
     def mutate_individual(self, individual: dict[str, bool|str]) -> dict[str, bool|str]:
