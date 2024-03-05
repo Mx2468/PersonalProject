@@ -60,8 +60,15 @@ def create_flag_string(flag_choices: dict[str, bool|str]) -> str:
                 final_str += f"{flag_name} "
             else:
                 # Case where the flag is not chosen
-                final_str += f"{flag_name.replace("-f", "-fno-", 1)} "
+                if flag_name == "-flive-patching":
+                    # In this case, the flag has no option to turn it off explicitly - it just needs to be omitted
+                    pass
+                else:
+                    final_str += f"{flag_name.replace("-f", "-fno-", 1)} "
         else:
-            final_str += f"{flag_name}={flag_choices[flag_name]} "
+            if type(flag_choice) == int:
+                final_str += f"{flag_name}={str(flag_choices[flag_name])} "
+            else:
+                final_str += f"{flag_name}={flag_choices[flag_name]} "
 
     return final_str
