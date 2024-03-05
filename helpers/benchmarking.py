@@ -19,6 +19,9 @@ class Benchmarker:
                            output_file_name: str,
                            opt_flag: str = "O0") -> str:
         """Compile a c++ source code file with the specified flags"""
+        if os.path.exists(output_file_name):
+            os.remove(output_file_name)
+
         subprocess.run(
             [f"g++ {opt_flag} -w -fpermissive -o {output_file_name} {self.SOURCE_CODE_FILE}"],
             shell=True, cwd=os.getcwd())
