@@ -110,16 +110,18 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
         return next_population
 
 
-    def get_n_fastest_flags(self, fitness_array: np.ndarray, n: int) -> list[dict[str, bool]]:
+    def get_n_fastest_flag_combinations(self, fitness_map: list[tuple], n: int) -> list[dict[str, bool]]:
         """
-        Select the n fastest current flags, as determined by a given set of fitness values
+        Select the n fastest current flag combinations, as determined by a given set of fitness values
         :param fitness_array: An array of fitness values, in the same order as self.current_flags
         :param n: The number of flags to select
         :return: A list of flag combinations
         """
         # Map flag choices to their fitness value
-        fitness_mapping = [(flag_comb, fitness) for flag_comb, fitness in zip(self.current_flags, fitness_array)]
+        fitness_mapping = [(flag_comb, fitness) for flag_comb, fitness in fitness_map]
+        # Sort the flag combinations by their fitness
         sorted_by_value = sorted(fitness_mapping, key = lambda x: x[1], reverse=True)
+        # Return first n flag combinations
         n_fastest_flags = [k for k, v in sorted_by_value[:n]]
         return n_fastest_flags
 
