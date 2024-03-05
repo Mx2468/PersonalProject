@@ -1,5 +1,5 @@
 """Methods to validate flag combinations/options are correct"""
-from random import randint
+from helpers import get_random_integer
 
 
 #TODO: Implement validation of domain flags
