@@ -1,6 +1,7 @@
+from random import sample
+
 from core.flags import Flags
-from helpers import get_random_flag_sample, Benchmarker, create_flag_string, validate_flag_choices, \
-    get_random_integer
+from helpers import get_random_flag_sample, Benchmarker, create_flag_string, validate_flag_choices, get_random_individual_flag_choice
 from optimisers.optimiser import FlagOptimiser
 import numpy as np
 
