@@ -124,22 +124,29 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
         return n_fastest_flags
 
 
-    def get_fitness_of_population(self, benchmarker: Benchmarker) -> np.ndarray:
+    def get_fitness_of_population(self, benchmarker: Benchmarker) -> list:
         """
         Assesses the fitness of the population
         :param benchmarker: The object used to benchmark individuals from the population
         :return: A numpy array of fitness values for the population, in the order of the population as in self.current_population
         """
-        fitness_array = np.array([])
+        # TODO: Ensure some kind of link between the individuals and their fitness
+        fitness_list = []
         for individual in self.current_flags:
-            individual_time = benchmarker.parallel_benchmark_flags(create_flag_string(individual), 3)
+            individual_time = benchmarker.parallel_benchmark_flags(create_flag_string(individual))
+            if individual_time < self.fastest_time:
+                self.fastest_flags = individual
+                self.fastest_time = individual_time
             # Get the reciprocal of the time taken to convert from smaller-is-better to bigger-is-better
             # Time+1 is used to deal with the case where time returns close to or == 0
             fitness = 1 / (1+individual_time)
-            fitness_array = np.append(fitness_array, [fitness])
-        return fitness_array
+            fitness_list.append((individual, fitness))
 
-    def choose_from_population(self, fitness_array: np.ndarray) -> list[dict[str, bool]]:
+        # TODO: select fastest flags here
+        return fitness_list
+
+
+    def choose_from_population(self, fitness_map: list[tuple]) -> list[dict[str, bool]]:
         """
         Chooses parents from the population with a probability distribution
         corresponding to the fitness of the individuals
