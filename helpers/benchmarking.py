@@ -20,7 +20,7 @@ class Benchmarker:
                            opt_flag: str = "O0") -> str:
         """Compile a c++ source code file with the specified flags"""
         subprocess.run(
-            [f"g++ {opt_flag} -w -o {output_file_name} {self.SOURCE_CODE_FILE}"],
+            [f"g++ {opt_flag} -w -fpermissive -o {output_file_name} {self.SOURCE_CODE_FILE}"],
             shell=True, cwd=os.getcwd())
         return output_file_name
 
