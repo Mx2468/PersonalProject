@@ -6,7 +6,7 @@
         "choices": [
           "stc"
         ],
-        "default": "simple"
+        "default": "stc"
       },
 
       {
@@ -16,6 +16,6 @@
           "dynamic"
       ],
       "default": "dynamic"
-  }
+      }
   ]
 }
