@@ -99,8 +99,6 @@ class FlagOptimisationController:
         except ReturnToMain:
             return optimiser.get_fastest_flags()
 
-    def dump_flags(self, filename: str) -> None:
-        pass
 
     def dump_flags(self, filename: str, flags: dict[str, bool|str]) -> None:
         with open(filename, 'w') as file_obj:
