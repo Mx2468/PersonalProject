@@ -146,10 +146,17 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
         :param benchmarker: The benchmarking object
         :return: A list of individual flag choices to use as parents
         """
+        fitness_array = []
+        individuals = []
+        for individual, fitness in fitness_map:
+            fitness_array.append(fitness)
+            individuals.append(individual)
         # Normalise fitness function results
-        normalised_fitness_array = fitness_array/np.sum(fitness_array)
+        normalisation_denominator = np.sum(fitness_array)
+        normalised_fitness_array = [fitness/normalisation_denominator for fitness in fitness_array]
         # Select with prob. dist. based on fitness function
-        population_choices = self.random_generator.choice(a=self.current_flags,
+        # Numpy random choice function used due to ability to use custom prob. dist. (p)
+        population_choices = self.random_generator.choice(a=individuals,
                                                           size=self.MIXING_NUMBER,
                                                           replace=False,
                                                           p=normalised_fitness_array)
