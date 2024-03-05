@@ -35,9 +35,8 @@ class Benchmarker:
         Compiles a source file with given flag choices
         and returns the benchmark time of the compiled code
         """
-        # new_name = self.generate_unique_outputfile_names(0, number_of_runs-1)
-        self.compile_with_flags(self.COMPILED_CODE_FILE, opt_flag)
-        return self.time_needed(number_of_runs, self.run_compiled_code, self.COMPILED_CODE_FILE)
+        compiled_code_name = self.compile_with_flags(self.COMPILED_CODE_FILE, opt_flag)
+        return self.time_needed(number_of_runs, self.run_compiled_code, compiled_code_name)
 
     @staticmethod
     def time_needed(number_of_repetitions: int,
