@@ -40,24 +40,28 @@ def validate_live_patching_issues(flag_choices: dict[str, bool|str|list[str]]) \
     priority is to keep live-patching off if these flags are impacted. The level also impacted, as
     "inline-only-static" is more restrictive in the flags it allows than "inline-clone".
     """
-    inline_clone_disabled_flags = ["-fwhole-program", "-fipa-pta", "-fipa-reference", "-fipa-ra",
-        "-fipa-icf", "-fipa-bit-cp",  "-fipa-vrp", "-fipa-pure-const", "-fipa-reference-addressable",
-        "-fipa-stack-alignment", "-fipa-modref"]
+    if "-flive-patching" in flag_choices.keys():
+        if flag_choices["-flto"] == True:
+            flag_choices["-flive-patching"] = "inline-clone"
 
-    inline_only_static_disabled_flags = ["-fipa-cp-clone", "-fipa-sra", "-fpartial-inlining", "-fipa-cp"]
+        inline_clone_disabled_flags = ["-fwhole-program", "-fipa-pta", "-fipa-reference", "-fipa-ra",
+            "-fipa-icf", "-fipa-bit-cp",  "-fipa-vrp", "-fipa-pure-const", "-fipa-reference-addressable",
+            "-fipa-stack-alignment", "-fipa-modref"]
 
-    # Case where flags enabled clash with the "inline-clone" setting
-    inline_clone_clash = any(map(lambda x: flag_choices[x] != False, inline_clone_disabled_flags))
-    # Case where flags enabled clash with the "inline-only-static" setting
-    inline_only_static_clash = any(map(lambda x: flag_choices[x] != False, inline_only_static_disabled_flags))
+        inline_only_static_disabled_flags = ["-fipa-cp-clone", "-fipa-sra", "-fpartial-inlining", "-fipa-cp"]
 
-    # Disable live patching if it interferes with any of the more useful flags
-    if inline_clone_clash or inline_only_static_clash:
-        if "-flive-patching" in flag_choices.keys():
-            del flag_choices["-flive-patching"]
-    elif not inline_clone_clash and not inline_only_static_clash:
-        flag_choices["-flive-patching"] = "inline-only-static"
-    elif not inline_clone_clash:
-        flag_choices["-flive-patching"] = "inline-clone"
+        # Case where flags enabled clash with the "inline-clone" setting
+        inline_clone_clash = any(map(lambda x: flag_choices[x] != False, inline_clone_disabled_flags))
+        # Case where flags enabled clash with the "inline-only-static" setting
+        inline_only_static_clash = any(map(lambda x: flag_choices[x] != False, inline_only_static_disabled_flags))
+
+        # Disable live patching if it interferes with any of the more useful flags
+        if inline_clone_clash or inline_only_static_clash:
+            if "-flive-patching" in flag_choices.keys():
+                del flag_choices["-flive-patching"]
+        elif not inline_clone_clash and not inline_only_static_clash:
+            flag_choices["-flive-patching"] = "inline-only-static"
+        elif not inline_clone_clash:
+            flag_choices["-flive-patching"] = "inline-clone"
 
     return flag_choices
