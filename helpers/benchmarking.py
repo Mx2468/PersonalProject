@@ -72,6 +72,15 @@ class Benchmarker:
         else:
             print("These flags perform just as well or worse than O3")
 
+        return
+
+    def compare_two_flag_choices(self, opt_flag1: str, opt_flag2: str ) -> None:
+        flags_time1 = self.parallel_benchmark_flags(opt_flag1)
+        flags_time2 = self.parallel_benchmark_flags(opt_flag2)
+        print(f"Flags time 1: {flags_time1}")
+        print(f"Flags time 2: {flags_time2}")
+        return
+
     @staticmethod
     def generate_unique_outputfile_names(start: int, end: int):
         for i in range(start, end):
