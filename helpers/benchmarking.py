@@ -87,7 +87,8 @@ class Benchmarker:
             yield ''.join([DEFAULT_COMPILED_FILE_NAME, str(i+1)])
 
     #TODO: Base this on the number of cores in a machine
-    def parallel_benchmark_flags(self, flag_string_to_benchmark: str, n_runs: int) -> float:
+    def parallel_benchmark_flags(self, flag_string_to_benchmark: str, n_runs: int = N_BENCHMARK_RUNS) -> float:
+        # Try-except statement used to prevent all current threads from printing the interrupt handling message
         output_names = list(islice(self.generate_unique_outputfile_names(0, n_runs), n_runs))
         with Pool(n_runs) as pool:
             # Compile each file with a unique output file name
@@ -101,6 +102,10 @@ class Benchmarker:
             # Run and benchmark the compiled files in parallel
             times = pool.starmap(self.time_needed, args_list)
         for name in output_names:
-            os.remove(name)
+            # TODO: Put in a try-except block here to catch the rare instance a file isn't able to be deleted
+            try:
+                os.remove(name)
+            except FileNotFoundError:
+                pass
 
         return sum(times)/n_runs
