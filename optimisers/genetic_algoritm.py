@@ -16,7 +16,6 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
     random_generator: np.random.Generator = np.random.default_rng()
     flags_object: Flags
 
-    # TODO: Change to load in flag domains from FlagChoices Object
     def __init__(self,
                  flags_to_optimise: Flags,
                  n_population: int = 5,
@@ -48,9 +47,11 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
         :param benchmarker: The object used to benchmark the code
         :return: The best flags once the algorithm has decided on a global minimum
         """
+        # Evaluate flags first to get the performance of the starting population
+        self.evaluate_flags(benchmarker)
         while self.states_explored < 2 ** len(self.current_flags[0].keys()):
             self.current_flags = self.optimisation_step(benchmarker)
-            self.evaluate_flags(benchmarker)
+            #self.evaluate_flags(benchmarker)
 
         return self.fastest_flags
 
@@ -61,9 +62,11 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
         :param n: The number of optimisation steps used
         :return: The best flags after n optimisation steps
         """
+        # Evaluate flags first to get the performance of the starting population
+        self.evaluate_flags(benchmarker)
         for i in range(n):
             self.current_flags = self.optimisation_step(benchmarker)
-            self.evaluate_flags(benchmarker)
+            #self.evaluate_flags(benchmarker)
 
         return self.fastest_flags
 
@@ -81,32 +84,30 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
         :param flags: A dictionary of flags and their on/off states to optimise from
         :return: The flags suggested after the optimisation step
         """
-        # Try-except statement used to prevent all current threads from printing the interrupt handling message
-        try:
-            next_population: list[dict[str, bool]] = []
+        next_population: list[dict[str, bool]] = []
 
-            # Run benchmark on the individuals
-            fitness_array = self.get_fitness_of_population(benchmarker)
+        # Run benchmark on the individuals
+        fitness_map = self.get_fitness_of_population(benchmarker)
 
-            if self.ELITISM_ENABLED:
-                next_population = self.get_n_fastest_flags(fitness_array, self.ELITISM_NUMBER_CARRIED)
+        if self.ELITISM_ENABLED:
+            if self.ELITISM_NUMBER_CARRIED == 1:
+                next_population.append(self.fastest_flags)
+            else:
+                for flags_choice in self.get_n_fastest_flag_combinations(fitness_map, self.ELITISM_NUMBER_CARRIED):
+                    next_population.append(flags_choice)
 
-            for i in range(self.n_population - len(next_population)):
-                # Apply fitness function (benchmark)
-                parents = self.choose_from_population(fitness_array)
-                # Reproduce offspring from parents
-                offspring = self.reproduce(*parents)
-                # Mutate at some small probabilities
-                mutated_offspring = self.mutate_individual(offspring)
-                next_population.append(validate_flag_choices(mutated_offspring))
-                self.states_explored += 1
+        for i in range(self.n_population - len(next_population)):
+            # Apply fitness function (benchmark)
+            parents = self.choose_from_population(fitness_map)
+            # Reproduce offspring from parents
+            offspring = self.reproduce(*parents)
+            # Mutate at some small probabilities
+            mutated_offspring = self.mutate_individual(offspring)
+            next_population.append(validate_flag_choices(mutated_offspring))
+            self.states_explored += 1
 
-            self.states_explored += self.n_population
+        return next_population
 
-            return next_population
-
-        except KeyboardInterrupt:
-            print("interrupted")
 
     def get_n_fastest_flags(self, fitness_array: np.ndarray, n: int) -> list[dict[str, bool]]:
         """
