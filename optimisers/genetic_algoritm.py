@@ -67,12 +67,10 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
 
         return self.fastest_flags
 
-
     def evaluate_flags(self, benchmarker: Benchmarker) -> None:
         """ Evaluates the flags to find if the flags are better than before"""
         for flag_comb in self.current_flags:
-            current_time = benchmarker.benchmark_flag_choices(
-                opt_flag=create_flag_string(flag_comb))
+            current_time = benchmarker.parallel_benchmark_flags(create_flag_string(flag_comb))
             if current_time < self.fastest_time:
                 self.fastest_flags = flag_comb
                 self.fastest_time = current_time
