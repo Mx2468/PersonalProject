@@ -5,9 +5,17 @@ import sys
 from optimisers import *
 import signal
 from helpers import constants, Benchmarker
+from multiprocessing import Manager
 
-interrupted_handler_executed = False
+def init_globals(flag, lock):
+    global global_flag
+    global global_lock
+    global_flag = flag
+    global_lock = lock
 
+# Instance of Exception with a readable name to handle returning to
+class ReturnToMain(Exception):
+    pass
 
 class FlagOptimisationController:
     """ A class to orchestrate and control the flag optimisation process"""
@@ -52,7 +60,7 @@ class FlagOptimisationController:
 
     def anytime_optimisation(self,
                              optimiser: FlagOptimiser,
-                             benchmark_obj: Benchmarker) -> dict[str, bool]:
+                             benchmark_obj: Benchmarker) -> dict[str, bool|str]:
         """
         Runs the optimisation loop until the computation is stopped via ctrl+c,
         then prints out the flags to the user
@@ -61,19 +69,35 @@ class FlagOptimisationController:
         :return The dictionary of flags and whether they were chosen or not
         """
         def return_results(*args) -> None:
-            # Global variable used between threads to make sure this message is only printed once
+            # Global value used between threads to make sure this message is only printed once
             # (i.e. by only one thread)
-            global interrupted_handler_executed
-            if not interrupted_handler_executed:
-                interrupted_handler_executed = True
-                print('You pressed ^C!')
-                print(f"States Explored: {optimiser.states_explored}")
-                print(f"Fastest Time: {optimiser.fastest_time}s")
-                print(f"Fastest Flags: {create_flag_string(optimiser.fastest_flags)}")
+            with global_lock:
+                if global_flag.value == 0:
+                    global_flag.value = 1
+                    print('You pressed ^C!')
+                    print(f"States Explored: {optimiser.states_explored}")
+                    print(f"Fastest Time: {optimiser.fastest_time}s")
+                    print(f"Fastest Flags: {create_flag_string(optimiser.fastest_flags)}")
+                    raise ReturnToMain
 
-        signal.signal(signal.SIGINT, return_results)
-        return optimiser.continuous_optimise(benchmark_obj)
+        try:
+            signal.signal(signal.SIGINT, return_results)
 
+            # Manager object used to coordinate shared value and lock across objects - ensures end result is only printed once
+            with Manager() as manager:
+                # Create shared Value & Lock
+                shared_flag = manager.Value('i', 0)
+                shared_lock = manager.Lock()
+
+                # Initialise globals for each process
+                init_globals(shared_flag, shared_lock)
+                return optimiser.continuous_optimise(benchmark_obj)
+
+        except KeyboardInterrupt:
+            print("Interrupted")
+
+        except ReturnToMain:
+            return optimiser.get_fastest_flags()
 
     def dump_flags(self, filename: str) -> None:
         pass
