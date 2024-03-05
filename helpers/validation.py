@@ -19,16 +19,15 @@ def validate_link_time_optimisation_flags(flag_choices: dict[str, bool | str | l
     # Make sure compression level is in the right bounds
     flto_compression_level = int(flag_choices["-flto-compression-level"])
     if flto_compression_level < 0 or flto_compression_level > 19:
-        flag_choices["-flto-compression-level"] = str(randint(0, 19))
+        flag_choices["-flto-compression-level"] = str(get_random_integer(0, 19))
 
-    if flag_choices["-ffat-lto-objects"] == False:
-        # Not using fat lto objects requires a linker with linker plugin support:
-        # '-fno-fat-lto-objects improves compilation time over plain LTO,
-        # but requires the complete toolchain to be aware of LTO.
-        # It requires a linker with linker plugin support for basic functionality'
-        # Therefore, fat LTO objects are automatically enabled for
-        # compatibility with more enviromnents
-        flag_choices["-ffat-lto-objects"] = True
+
+    # Using this flag raises an error due to the lack of a linker with linker plugin support
+    # Using -fno-fat-lto-objects seems to reduce performance
+    # Removing the flag choice entirely and allowing the default to be calculated by g++ seems to make both problems go away
+    if "-ffat-lto-objects" in flag_choices.keys():
+        del flag_choices["-ffat-lto-objects"]
+
     return flag_choices
 
 
