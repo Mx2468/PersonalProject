@@ -38,6 +38,7 @@ def get_random_individual_flag_choice(flags_obj: Flags, flag_name: str):
             # For now - just use a random integer
             return get_random_integer()
         case [*domain_values]:
+            # Special case for live-patching
             if flag_name == "-flive-patching":
                 domain_values += [False]
                 return choice(domain_values)
