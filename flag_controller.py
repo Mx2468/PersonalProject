@@ -64,6 +64,7 @@ class FlagOptimisationController:
         print(f"States Explored: {optimiser.states_explored}")
         print(f"Fastest Time: {optimiser.fastest_time}s")
         print(f"Fastest Flags: {create_flag_string(optimiser.fastest_flags)}")
+        dump_flags("flag_dump.txt", optimiser.fastest_flags)
         return optimiser.fastest_flags
 
     def anytime_optimisation(self,
@@ -86,6 +87,7 @@ class FlagOptimisationController:
                     print(f"States Explored: {optimiser.states_explored}")
                     print(f"Fastest Time: {optimiser.fastest_time}s")
                     print(f"Fastest Flags: {create_flag_string(optimiser.fastest_flags)}")
+                    dump_flags("flag_dump.txt", optimiser.fastest_flags)
                     raise ReturnToMain
 
         try:
@@ -108,13 +110,6 @@ class FlagOptimisationController:
             return optimiser.get_fastest_flags()
 
 
-    def dump_flags(self, filename: str, flags: dict[str, bool|str]) -> None:
-        with open(filename, 'w') as file_obj:
-            for flag_name, value in flags.items():
-                file_obj.write(f"{flag_name}={value}\n")
-
-#TODO have cli flags control which optimisation method and approach to use (default random search anytime algorithm)
-#TODO: Implement dumping of the flags to a file or stdout at the end of anytime optimisation
 #TODO: Change as many class attributes as possible to private
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser(prog="Compiler flag optimiser",
@@ -187,8 +182,6 @@ if __name__ == '__main__':
             o3_flags[flag] = False
 
     o3_flags = validate_flag_choices(o3_flags)
-    # print(f"o3_flags: {o3_flags}")
-    # sys.exit(0)
 
     optimiser = GeneticAlgorithmOptimiser(controller.flags, 10, [o3_flags])
 
@@ -196,7 +189,7 @@ if __name__ == '__main__':
         fastest_flags = controller.anytime_optimisation(optimiser, benchmarker)
     else:
         fastest_flags = controller.contract_optimisation(opt_steps, optimiser, benchmarker)
-    #fastest_flags = controller.anytime_optimisation(optimiser, benchmarker)
+
     benchmarker.compare_two_flag_choices(
         opt_flag1=create_flag_string(fastest_flags),
         opt_flag2=create_flag_string(o3_flags))
