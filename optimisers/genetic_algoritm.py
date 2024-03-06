@@ -1,19 +1,21 @@
 from random import sample
 
 from core.flags import Flags
-from helpers import get_random_flag_sample, Benchmarker, create_flag_string, validate_flag_choices, get_random_individual_flag_choice
+from helpers import (get_random_flag_sample, Benchmarker, create_flag_string,
+                     validate_flag_choices, get_random_individual_flag_choice)
 from optimisers.optimiser import FlagOptimiser
 import numpy as np
 
 class GeneticAlgorithmOptimiser(FlagOptimiser):
 
     #TODO: Experiment with these current parameters (informed by research)
-    MUTATION_RATE = 0.01
-    MIXING_NUMBER = 2
+    #TODO: Move these parameters to a config file
+    MUTATION_RATE = 0.1
+    MIXING_NUMBER = 3
     ELITISM_ENABLED = True
     ELITISM_NUMBER_CARRIED = 1
-    current_flags: list[dict[str, bool]] = []
     n_population: int = 5
+    current_flags: list[dict[str, bool]] = []
     random_generator: np.random.Generator = np.random.default_rng()
     flags_object: Flags
 
@@ -23,7 +25,7 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
                  starting_population: list[dict[str, bool|str]] = None,
                  **kwargs):
         #TODO: Document kwargs
-        super().__init__(flags_to_optimise.get_all_flag_names())
+        super().__init__(flags_to_optimise)
         # Setup initial random population
         self.flags_object = flags_to_optimise
         self.n_population = n_population
@@ -52,7 +54,6 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
         self.evaluate_flags(benchmarker)
         while self.states_explored < 2 ** len(self.current_flags[0].keys()):
             self.current_flags = self.optimisation_step(benchmarker)
-            #self.evaluate_flags(benchmarker)
 
         return self.fastest_flags
 
@@ -67,7 +68,6 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
         self.evaluate_flags(benchmarker)
         for i in range(n):
             self.current_flags = self.optimisation_step(benchmarker)
-            #self.evaluate_flags(benchmarker)
 
         return self.fastest_flags
 
@@ -106,6 +106,7 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
             mutated_offspring = self.mutate_individual(offspring)
             next_population.append(validate_flag_choices(mutated_offspring))
             self.states_explored += 1
+            self.print_optimisation_info()
 
         return next_population
 
@@ -144,7 +145,6 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
             fitness = 1 / (1+individual_time)
             fitness_list.append((individual, fitness))
 
-        # TODO: select fastest flags here
         return fitness_list
 
 
@@ -190,7 +190,7 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
             for key in keys:
                 child[key] = parents[i][key]
 
-        # Add last bit of flags
+        # Add last section of flags
         for key in list(parents[-1].keys())[last_point:n_flags]:
             child[key] = parents[-1][key]
         return child
@@ -203,10 +203,7 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
         """
         for key in individual.keys():
             if self.random_generator.uniform() < self.MUTATION_RATE:
-                if self.flags_object.get_flag_domain(key) == [True, False]:
-                    individual[key] = not individual[key]
-                else:
-                    individual[key] = get_random_individual_flag_choice(self.flags_object, key)
+                individual[key] = get_random_individual_flag_choice(self.flags_object, key)
 
         return individual
 
