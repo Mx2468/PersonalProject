@@ -131,7 +131,8 @@ if __name__ == '__main__':
 
     argparser.add_argument("-o", "--output",
                            dest="output",
-                           help="Path to the output file to write the flag choices to.")
+                           help="Path to the output file to write the flag choices to.",
+                           default="flags_dump.txt")
 
     argparser.add_argument("-m", "--method",
                            dest="method",
