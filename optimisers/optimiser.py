@@ -1,6 +1,8 @@
 """An abstract class for an optimiser of binary (on/off) flags"""
 from abc import ABC, abstractmethod
-from helpers import Benchmarker
+
+from core.flags import Flags
+from helpers import Benchmarker, get_random_flag_sample
 
 
 class FlagOptimiser(ABC):
@@ -8,11 +10,13 @@ class FlagOptimiser(ABC):
     fastest_flags: dict[str, bool] = {}
     current_flags: dict[str, bool] = {}
     fastest_time: float
+    opt_steps_done: int = 0
     states_explored: int = 0
 
-    def __init__(self, flags: list[str]):
-        self.fastest_flags = {flag: False for flag in flags}
-        self.current_flags = {flag: False for flag in flags}
+    def __init__(self, flags: Flags):
+        #TODO: Consider changing this to a random choice of flags (defensive flags and completeness)
+        self.fastest_flags = get_random_flag_sample(flags)
+        self.current_flags = get_random_flag_sample(flags)
         self.fastest_time = float('inf')
 
     @abstractmethod
@@ -42,6 +46,10 @@ class FlagOptimiser(ABC):
         :return: The flags suggested after the optimisation step
         """
         raise NotImplementedError
+
+    def print_optimisation_info(self):
+        print(f"Number of states explored: {self.states_explored}")
+        print(f"Fastest time so far: {self.fastest_time}")
 
     def get_fastest_flags(self) -> dict[str, bool]:
         """Returns the current fastest flags of the optimiser"""
