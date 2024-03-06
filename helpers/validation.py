@@ -7,7 +7,7 @@ def validate_flag_choices(flag_choices: dict[str, bool | str | list[str]]) -> di
     flag_choices = validate_live_patching_issues(flag_choices)
     flag_choices = validate_link_time_optimisation_flags(flag_choices)
 
-    # Not supported by my configuration
+    # Not supported by my project's target configuration/architecture
     if "-fkeep-inline-dllexport" in flag_choices.keys():
         del flag_choices["-fkeep-inline-dllexport"]
 
