@@ -40,10 +40,10 @@ class FlagOptimisationController:
         flags_obj.load_in_flags(binary_flags_file, domain_flags_file)
         self.flags = flags_obj
 
-    def n_times_optimisation(self,
-                             n_steps: int,
-                             optimiser: FlagOptimiser,
-                             benchmark_obj: Benchmarker) -> dict[str, bool]:
+    def contract_optimisation(self,
+                              n_steps: int,
+                              optimiser: FlagOptimiser,
+                              benchmark_obj: Benchmarker) -> dict[str, bool]:
         """
         Run the optimisation for n steps and return the optimal flags after those steps
         :param n_steps: The number of steps to run the simulation for
@@ -105,9 +105,7 @@ class FlagOptimisationController:
             for flag_name, value in flags.items():
                 file_obj.write(f"{flag_name}={value}\n")
 
-#TODO: "-fsched-stalled-insns" has an invalid value presented to it
 #TODO have cli flags control which optimisation method and approach to use (default random search anytime algorithm)
-#TODO: Rename "n-step" optimisation to contract algorithm
 #TODO: Implement dumping of the flags to a file or stdout at the end of anytime optimisation
 #TODO: Change as many class attributes as possible to private
 if __name__ == '__main__':
