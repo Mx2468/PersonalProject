@@ -8,7 +8,6 @@ from random import getrandbits, choice, randint
 from core.flags import Flags
 from helpers.constants import INTEGER_DOMAIN_UPPER_BOUND
 
-
 def get_random_integer(lower_bound = 1, upper_bound = INTEGER_DOMAIN_UPPER_BOUND) -> int:
     return randint(lower_bound, upper_bound)
 
