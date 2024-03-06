@@ -7,11 +7,19 @@ import signal
 from helpers import constants, Benchmarker
 from multiprocessing import Manager
 
+import argparse
+
 def init_globals(flag, lock):
     global global_flag
     global global_lock
     global_flag = flag
     global_lock = lock
+
+def dump_flags(filename: str, flags: dict[str, bool|str]) -> None:
+    with open(filename, 'w') as file_obj:
+        for flag_name, value in flags.items():
+            file_obj.write(f"{flag_name}={value}\n")
+
 
 # Instance of Exception with a readable name to handle returning to
 class ReturnToMain(Exception):
@@ -109,12 +117,62 @@ class FlagOptimisationController:
 #TODO: Implement dumping of the flags to a file or stdout at the end of anytime optimisation
 #TODO: Change as many class attributes as possible to private
 if __name__ == '__main__':
-    SOURCE_CODE_FILE = os.path.join(constants.SOURCE_CODE_DIR, "BreadthFSSudoku.cpp")
-    controller = FlagOptimisationController("flags/binary_flags.txt",
-                                            "flags/domain_flags.json",
-                                            SOURCE_CODE_FILE)
+    argparser = argparse.ArgumentParser(prog="Compiler flag optimiser",
+                            description="A piece of software to optimise the optimisation options for the g++ compiler, given an input c++ file.")
 
-    benchmarker = Benchmarker(SOURCE_CODE_FILE)
+    argparser.add_argument("-i", "--input",
+                           dest="input",
+                           help="Path to the input c++ file to optimise flag choices for.")
+
+    argparser.add_argument("-bf", "--binary-flags",
+                           dest="b_input_flags",
+                           help="Paths to the binary (true/false) input flags as a .txt file.",
+                           default="flags/binary_flags.txt")
+
+    argparser.add_argument("-df", "--domain-flags",
+                           dest="d_input_flags",
+                           help="Path to the domain flags file (.json format).",
+                           default="flags/domain_flags.json")
+
+    argparser.add_argument("-o", "--output",
+                           dest="output",
+                           help="Path to the output file to write the flag choices to.")
+
+    argparser.add_argument("-m", "--method",
+                           dest="method",
+                           help="Optimisation method used to optimise the flag choices.",
+                           choices=["random", "genetic"],
+                           default="genetic")
+
+    argparser.add_argument("-n", "--opt-steps",
+                           dest="opt_steps",
+                           help="Number of optimisation steps to run. No value or a value below 1 means an anytime-algorithm will run.")
+
+    argparser.add_argument("--start-with-o3",
+                           dest="start_o3",
+                           choices=["true", "false"],
+                           action='store_true')
+
+    argparser.add_argument("--compare-with-o3",
+                           dest="compare_o3",
+                           choices=["true", "false"],
+                           action='store_true',
+                           help="Compare with 03 flags after the optimisation of the ")
+
+    parsed_args = argparser.parse_args()
+
+    input_source_code_file = parsed_args.input
+    output_file = parsed_args.output
+    opt_method = parsed_args.method
+    opt_steps = parsed_args.opt_steps
+    binary_input_flags = parsed_args.b_input_flags
+    domain_input_flags = parsed_args.d_input_flags
+
+    controller = FlagOptimisationController(binary_input_flags,
+                                            domain_input_flags,
+                                            input_source_code_file)
+
+    benchmarker = Benchmarker(input_source_code_file)
 
 
     o3_flags_obj = Flags()
@@ -132,6 +190,14 @@ if __name__ == '__main__':
     # print(f"o3_flags: {o3_flags}")
     # sys.exit(0)
 
-    optimiser = GeneticAlgorithmOptimiser(controller.flags, 4, [o3_flags])
-    controller.anytime_optimisation(optimiser, benchmarker)
-    benchmarker.compare_with_o3(create_flag_string(optimiser.get_fastest_flags()))
+    optimiser = GeneticAlgorithmOptimiser(controller.flags, 10, [o3_flags])
+
+    if opt_steps is None or opt_steps <= 0:
+        fastest_flags = controller.anytime_optimisation(optimiser, benchmarker)
+    else:
+        fastest_flags = controller.contract_optimisation(opt_steps, optimiser, benchmarker)
+    #fastest_flags = controller.anytime_optimisation(optimiser, benchmarker)
+    benchmarker.compare_two_flag_choices(
+        opt_flag1=create_flag_string(fastest_flags),
+        opt_flag2=create_flag_string(o3_flags))
+    sys.exit(0)
