@@ -9,6 +9,7 @@ from multiprocessing import Manager
 
 import argparse
 
+# Sets up global variables for lock and value for processess to commuinicate
 def init_globals(flag, lock):
     global global_flag
     global global_lock
@@ -41,7 +42,7 @@ class FlagOptimisationController:
         :param compiled_code_name: A path/name for the intermediate compiled executable file
         (not necessary for most uses - only if the environment rejects the default name)
         """
-        self.SOURCE_CODE_FILE = os.path.join(constants.SOURCE_CODE_DIR, source_code_file)
+        self.SOURCE_CODE_FILE = source_code_file
         self.COMPILED_CODE_FILE = compiled_code_name
 
         flags_obj = Flags()
@@ -90,6 +91,7 @@ class FlagOptimisationController:
                     dump_flags("flag_dump.txt", optimiser.fastest_flags)
                     raise ReturnToMain
 
+        # TODO: Add printed information about the fact that this is an anytime optimisation algorithm
         try:
             signal.signal(signal.SIGINT, return_results)
 
@@ -111,6 +113,8 @@ class FlagOptimisationController:
 
 
 #TODO: Change as many class attributes as possible to private
+#TODO: Allow users to enable/disable flags that break the standard
+#TODO: Validate input file to ensure it is a valid .cpp file
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser(prog="Compiler flag optimiser",
                             description="A piece of software to optimise the optimisation options for the g++ compiler, given an input c++ file.")
@@ -122,12 +126,12 @@ if __name__ == '__main__':
     argparser.add_argument("-bf", "--binary-flags",
                            dest="b_input_flags",
                            help="Paths to the binary (true/false) input flags as a .txt file.",
-                           default="flags/binary_flags.txt")
+                           default="./flags/binary_flags.txt")
 
     argparser.add_argument("-df", "--domain-flags",
                            dest="d_input_flags",
                            help="Path to the domain flags file (.json format).",
-                           default="flags/domain_flags.json")
+                           default="./flags/domain_flags.json")
 
     argparser.add_argument("-o", "--output",
                            dest="output",
@@ -144,25 +148,27 @@ if __name__ == '__main__':
                            dest="opt_steps",
                            help="Number of optimisation steps to run. No value or a value below 1 means an anytime-algorithm will run.")
 
-    argparser.add_argument("--start-with-o3",
-                           dest="start_o3",
-                           choices=["true", "false"],
-                           action='store_true')
-
-    argparser.add_argument("--compare-with-o3",
-                           dest="compare_o3",
-                           choices=["true", "false"],
+    argparser.add_argument("--dont-start-with-o3",
+                           dest="dont_start_o3",
                            action='store_true',
-                           help="Compare with 03 flags after the optimisation of the ")
+                           help="Do not start with 03 flags as a base.")
+
+    argparser.add_argument("--dont-compare-with-o3",
+                           dest="dont_compare_o3",
+                           action='store_true',
+                           help="Skip comparing with 03 flags after the optimisation of the flag choices has finished.")
 
     parsed_args = argparser.parse_args()
 
-    input_source_code_file = parsed_args.input
+    input_source_code_file = str(parsed_args.input)
     output_file = parsed_args.output
     opt_method = parsed_args.method
     opt_steps = parsed_args.opt_steps
-    binary_input_flags = parsed_args.b_input_flags
-    domain_input_flags = parsed_args.d_input_flags
+    binary_input_flags = str(parsed_args.b_input_flags)
+    domain_input_flags = str(parsed_args.d_input_flags)
+    #TODO: Implement passing on value of flag dump
+
+    print(binary_input_flags)
 
     controller = FlagOptimisationController(binary_input_flags,
                                             domain_input_flags,
@@ -170,9 +176,9 @@ if __name__ == '__main__':
 
     benchmarker = Benchmarker(input_source_code_file)
 
-
+    # TODO: Fix this to include all domain flags.
     o3_flags_obj = Flags()
-    o3_flags_obj.load_in_flags("./flags/O3_flags.txt", "./flags/domain_flags.json")
+    o3_flags_obj.load_in_flags("./flags/O3_flags.txt", "./flags/o3_domain_flags.json")
 
     # TODO: Implement a reader to load these flags in as true/their default values as provided to allow them to be used directly
     o3_flags = {bin_flag: True for bin_flag in o3_flags_obj.get_all_flag_names()}
@@ -190,6 +196,8 @@ if __name__ == '__main__':
         fastest_flags = controller.anytime_optimisation(optimiser, benchmarker)
     else:
         fastest_flags = controller.contract_optimisation(opt_steps, optimiser, benchmarker)
+
+    print("Please Wait while your flags are compared with that of -03")
 
     benchmarker.compare_two_flag_choices(
         opt_flag1=create_flag_string(fastest_flags),
