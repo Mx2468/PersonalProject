@@ -62,19 +62,6 @@ class Benchmarker:
         self.GLOBAL_COUNTER += 1
         return name
 
-    def compare_with_o3(self, opt_flag: str) -> None:
-        """Benchmarks the flags against the -O3 "golden standard" and returns the better one"""
-        flags_time = self.benchmark_flag_choices(opt_flag)
-        o3_time = self.benchmark_flag_choices("-O3")
-        print(f"Fastest flags time: {flags_time}")
-        print(f"O3 time: {o3_time}")
-        if flags_time < o3_time:
-            print("These flags are better than O3!")
-        else:
-            print("These flags perform just as well or worse than O3")
-
-        return
-
     def compare_two_flag_choices(self, opt_flag1: str, opt_flag2: str ) -> None:
         flags_time1 = self.parallel_benchmark_flags(opt_flag1)
         flags_time2 = self.parallel_benchmark_flags(opt_flag2)
