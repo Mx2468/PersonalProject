@@ -13,13 +13,16 @@ class Benchmarker:
     """A class containing the benchmarking info and behaviour"""
     GLOBAL_COUNTER = 0
 
-    def __init__(self, source_code_to_benchmark: str, compiled_file_name: str = DEFAULT_COMPILED_FILE_NAME):
+    def __init__(self,
+                 source_code_to_benchmark: str,
+                 compiled_file_name: str = DEFAULT_COMPILED_FILE_NAME):
+
         self.SOURCE_CODE_FILE = source_code_to_benchmark
         self.COMPILED_CODE_FILE = compiled_file_name
 
     def compile_with_flags(self,
                            output_file_name: str,
-                           opt_flag: str = "O0") -> str:
+                           opt_flag: str) -> str:
         """Compile a c++ source code file with the specified flags"""
         if os.path.exists(output_file_name):
             os.remove(output_file_name)
@@ -31,7 +34,7 @@ class Benchmarker:
 
 
     def benchmark_flag_choices(self,
-                               opt_flag: str = "-O0",
+                               opt_flag: str,
                                number_of_runs: int = N_BENCHMARK_RUNS) -> float:
         """
         Compiles a source file with given flag choices
@@ -55,7 +58,7 @@ class Benchmarker:
 
     def run_compiled_code(self, *args) -> None:
         """Executes the compiled code file """
-        subprocess.run(f"./{args[0]}", shell=True, cwd=os.getcwd())
+        subprocess.run(f"./{args[0]}", shell=True, cwd=os.getcwd(), stdout=subprocess.DEVNULL)
 
     def get_fresh_file_name(self) -> str:
         name = self.COMPILED_CODE_FILE + str(self.GLOBAL_COUNTER)
@@ -90,7 +93,6 @@ class Benchmarker:
             # Run and benchmark the compiled files in parallel
             times = pool.starmap(self.time_needed, args_list)
         for name in output_names:
-            # TODO: Put in a try-except block here to catch the rare instance a file isn't able to be deleted
             try:
                 os.remove(name)
             except FileNotFoundError:
