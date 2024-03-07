@@ -158,6 +158,10 @@ if __name__ == '__main__':
                            dest="opt_steps",
                            help="Number of optimisation steps to run. No value or a value below 1 means an anytime-algorithm will run.")
 
+    argparser.add_argument("--num-code-runs",
+                           dest="n_code_runs",
+                           help="Number of code runs used to benchmark the ")
+
     argparser.add_argument("--dont-start-with-o3",
                            dest="dont_start_o3",
                            action='store_true',
