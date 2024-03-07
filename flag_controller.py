@@ -66,6 +66,7 @@ class FlagOptimisationController:
         :param benchmark_obj: The object for benchmarking
         :return: The dictionary of flags and whether they were chosen or not
         """
+        print(f"Running optimisation for {n_steps} steps")
         optimiser.n_steps_optimise(benchmark_obj, n_steps)
         print('The optimisation process finished')
         print(f"States Explored: {optimiser.states_explored}")
@@ -99,7 +100,6 @@ class FlagOptimisationController:
                     dump_flags(output_file, optimiser.fastest_flags)
                     raise ReturnToMain
 
-        # TODO: Add printed information about the fact that this is an anytime optimisation algorithm
         try:
             print("Using anytime algorithm for optimisation, press ^C to stop and return flags")
             signal.signal(signal.SIGINT, return_results)
@@ -124,6 +124,7 @@ class FlagOptimisationController:
 #TODO: Change as many class attributes as possible to private
 #TODO: Allow users to enable/disable flags that break the standard
 #TODO: Validate input file to ensure it is a valid .cpp file
+#TODO: Update Random optimiser to comply with how program should run
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser(prog="Compiler flag optimiser",
                             description="A piece of software to optimise the optimisation options for the g++ compiler, given an input c++ file.")
@@ -181,9 +182,9 @@ if __name__ == '__main__':
     binary_input_flags = str(parsed_args.b_input_flags)
     domain_input_flags = str(parsed_args.d_input_flags)
     dont_start_o3 = parsed_args.dont_start_o3
+    # TODO: Implement not comparing O3 flags
     dont_compare_o3 = parsed_args.dont_compare_o3
     dont_use_standard_breaking_flags = parsed_args.dont_use_standard_breaking_flags
-    #TODO: Implement passing on value of flag dump (output)
 
     controller = FlagOptimisationController(binary_input_flags,
                                             domain_input_flags,
