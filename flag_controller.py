@@ -17,6 +17,7 @@ def init_globals(flag, lock):
     global_lock = lock
 
 def dump_flags(filename: str, flags: dict[str, bool|str]) -> None:
+    print(f"Writing flag choices to {filename}")
     with open(filename, 'w') as file_obj:
         for flag_name, value in flags.items():
             file_obj.write(f"{flag_name}={value}\n")
