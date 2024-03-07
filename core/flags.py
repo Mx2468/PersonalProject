@@ -32,9 +32,11 @@ class Flags:
           self.flag_domains[flag_name] = domain
 
     def remove_flag(self, flag_name: str) -> None:
-        self.all_flag_names.remove(flag_name)
-        del self.flag_domains[flag_name]
-        del self.domain_flag_default[flag_name]
+        if flag_name in self.all_flag_names:
+            self.all_flag_names.remove(flag_name)
+            if flag_name in self.flag_domains.keys():
+                del self.flag_domains[flag_name]
+                del self.domain_flag_default[flag_name]
 
     def get_all_flag_names(self) -> list[str]:
         """Returns a list of all the flag names"""
