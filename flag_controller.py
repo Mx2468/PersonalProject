@@ -34,7 +34,8 @@ class FlagOptimisationController:
                  binary_flags_file: str,
                  domain_flags_file: str,
                  source_code_file: str,
-                 compiled_code_name: str = constants.COMPILED_CODE_FILE):
+                 compiled_code_name: str = constants.COMPILED_CODE_FILE,
+                 **kwargs):
         """
         :param binary_flags_file: The path to the file containing the binary choice flags
         :param domain_flags_file: The path to the file containing the domain choice flags
@@ -47,6 +48,10 @@ class FlagOptimisationController:
 
         flags_obj = Flags()
         flags_obj.load_in_flags(binary_flags_file, domain_flags_file)
+        if dont_use_standard_breaking_flags:
+           print("Turning off standard-breaking flags")
+           for flag_name in ["-ffast-math", "-fallow-store-data-races"]:
+               flags_obj.remove_flag(flag_name)
         self.flags = flags_obj
 
     def contract_optimisation(self,
@@ -65,7 +70,8 @@ class FlagOptimisationController:
         print(f"States Explored: {optimiser.states_explored}")
         print(f"Fastest Time: {optimiser.fastest_time}s")
         print(f"Fastest Flags: {create_flag_string(optimiser.fastest_flags)}")
-        dump_flags("flag_dump.txt", optimiser.fastest_flags)
+        global output_file
+        dump_flags(output_file, optimiser.fastest_flags)
         return optimiser.fastest_flags
 
     def anytime_optimisation(self,
@@ -88,7 +94,8 @@ class FlagOptimisationController:
                     print(f"States Explored: {optimiser.states_explored}")
                     print(f"Fastest Time: {optimiser.fastest_time}s")
                     print(f"Fastest Flags: {create_flag_string(optimiser.fastest_flags)}")
-                    dump_flags("flag_dump.txt", optimiser.fastest_flags)
+                    global output_file
+                    dump_flags(output_file, optimiser.fastest_flags)
                     raise ReturnToMain
 
         # TODO: Add printed information about the fact that this is an anytime optimisation algorithm
@@ -158,6 +165,11 @@ if __name__ == '__main__':
                            action='store_true',
                            help="Skip comparing with 03 flags after the optimisation of the flag choices has finished.")
 
+    argparser.add_argument("-std --dont-use-standard-breaking-flags",
+                           dest="dont_use_standard_breaking_flags",
+                           action='store_true',
+                           help="Do not use the flags that break the c++ standard")
+
     parsed_args = argparser.parse_args()
 
     input_source_code_file = str(parsed_args.input)
@@ -166,13 +178,15 @@ if __name__ == '__main__':
     opt_steps = parsed_args.opt_steps
     binary_input_flags = str(parsed_args.b_input_flags)
     domain_input_flags = str(parsed_args.d_input_flags)
-    #TODO: Implement passing on value of flag dump
-
-    print(binary_input_flags)
+    dont_start_o3 = parsed_args.dont_start_o3
+    dont_compare_o3 = parsed_args.dont_compare_o3
+    dont_use_standard_breaking_flags = parsed_args.dont_use_standard_breaking_flags
+    #TODO: Implement passing on value of flag dump (output)
 
     controller = FlagOptimisationController(binary_input_flags,
                                             domain_input_flags,
-                                            input_source_code_file)
+                                            input_source_code_file,
+                                            kwargs={dont_use_standard_breaking_flags})
 
     benchmarker = Benchmarker(input_source_code_file)
 
