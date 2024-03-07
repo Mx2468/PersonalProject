@@ -120,11 +120,10 @@ class FlagOptimisationController:
         except ReturnToMain:
             return optimiser.get_fastest_flags()
 
-
-#TODO: Change as many class attributes as possible to private
-#TODO: Allow users to enable/disable flags that break the standard
-#TODO: Validate input file to ensure it is a valid .cpp file
-#TODO: Update Random optimiser to comply with how program should run
+# TODO: Add run scripts for a variety of necessary scenarios
+# TODO: Change as many class attributes as possible to private
+# TODO: Validate input file to ensure it is a valid .cpp file
+# TODO: Update Random optimiser to comply with how program should run
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser(prog="Compiler flag optimiser",
                             description="A piece of software to optimise the optimisation options for the g++ compiler, given an input c++ file.")
