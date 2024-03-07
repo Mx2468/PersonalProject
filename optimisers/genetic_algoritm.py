@@ -39,10 +39,6 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
             self.current_flags += [validate_flag_choices(get_random_flag_sample(self.flags_object))
                                    for i in range(flags_to_add)]
 
-        for argument in kwargs:
-            # TODO: Add error handling to check kwarg exists
-            setattr(self, argument, kwargs[argument])
-
 
     def continuous_optimise(self, benchmarker: Benchmarker) -> dict[str, bool]:
         """
