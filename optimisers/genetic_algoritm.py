@@ -46,6 +46,7 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
         :return: The best flags once the algorithm has decided on a global minimum
         """
         # Evaluate flags first to get the performance of the starting population
+        print(f"States explored: {self.states_explored}")
         self.evaluate_flags(benchmarker)
         while self.states_explored < 2 ** len(self.current_flags[0].keys()):
             self.current_flags = self.optimisation_step(benchmarker)
@@ -60,6 +61,7 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
         :return: The best flags after n optimisation steps
         """
         # Evaluate flags first to get the performance of the starting population
+        print(f"States explored: {self.states_explored}")
         self.evaluate_flags(benchmarker)
         for i in range(n):
             self.current_flags = self.optimisation_step(benchmarker)
@@ -100,8 +102,9 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
             # Mutate at some small probabilities
             mutated_offspring = self.mutate_individual(offspring)
             next_population.append(validate_flag_choices(mutated_offspring))
-            self.states_explored += 1
-            self.print_optimisation_info()
+
+        self.opt_steps_done += 1
+        self.print_optimisation_info()
 
         return next_population
 
@@ -128,7 +131,6 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
         :param benchmarker: The object used to benchmark individuals from the population
         :return: A numpy array of fitness values for the population, in the order of the population as in self.current_population
         """
-        # TODO: Ensure some kind of link between the individuals and their fitness
         fitness_list = []
         for individual in self.current_flags:
             individual_time = benchmarker.parallel_benchmark_flags(create_flag_string(individual))
@@ -139,6 +141,8 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
             # Time+1 is used to deal with the case where time returns close to or == 0
             fitness = 1 / (1+individual_time)
             fitness_list.append((individual, fitness))
+            self.states_explored += 1
+            print(f"States explored: {self.states_explored}")
 
         return fitness_list
 
