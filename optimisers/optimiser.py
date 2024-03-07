@@ -48,6 +48,7 @@ class FlagOptimiser(ABC):
         raise NotImplementedError
 
     def print_optimisation_info(self):
+        print(f"Number of optimisation steps: {self.opt_steps_done}")
         print(f"Number of states explored: {self.states_explored}")
         print(f"Fastest time so far: {self.fastest_time}")
 
