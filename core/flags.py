@@ -21,6 +21,8 @@ class Flags:
             self.all_flag_names += bin_flags_reader.get_flags()
             for flag_name in self.all_flag_names:
                 self.flag_domains[flag_name] = [True, False]
+                # Automatically set flags to false
+                self.domain_flag_default[flag_name] = False
 
         with domain_flag_reader.DomainFlagReader(domain_flag_path) as domain_reader:
             domain_reader.read_in_flags()
