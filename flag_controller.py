@@ -193,7 +193,7 @@ if __name__ == '__main__':
     controller = FlagOptimisationController(binary_input_flags,
                                             domain_input_flags,
                                             input_source_code_file,
-                                            kwargs={dont_use_standard_breaking_flags})
+                                            dont_use_standard_breaking_flags=dont_use_standard_breaking_flags)
 
     benchmarker = Benchmarker(input_source_code_file)
 
