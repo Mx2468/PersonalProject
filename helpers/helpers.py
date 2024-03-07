@@ -55,7 +55,8 @@ def create_flag_string(flag_choices: dict[str, bool|str]) -> str:
     """
     final_str = ""
     for flag_name, flag_choice in flag_choices.items():
-        if flag_choice == True or flag_choice == False:
+        # Binary flags
+        if type(flag_choice) == bool:
             if flag_choice:
                 final_str += f"{flag_name} "
             else:
@@ -65,10 +66,13 @@ def create_flag_string(flag_choices: dict[str, bool|str]) -> str:
                     pass
                 else:
                     final_str += f"{flag_name.replace("-f", "-fno-", 1)} "
+
+        # Non-binary/domain flags
         else:
             if type(flag_choice) == int:
                 final_str += f"{flag_name}={str(flag_choices[flag_name])} "
             else:
                 final_str += f"{flag_name}={flag_choices[flag_name]} "
+
 
     return final_str
