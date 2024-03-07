@@ -3,7 +3,7 @@ from reader import binary_flag_reader, domain_flag_reader
 class Flags:
     all_flag_names: list[str]
     flag_domains: dict[str, str|list[str]|list[bool]]
-    domain_flag_defaults: dict[str, str]
+    domain_flag_default: dict[str, str]
 
     def __init__(self):
         self.all_flag_names = []
@@ -25,11 +25,16 @@ class Flags:
         with domain_flag_reader.DomainFlagReader(domain_flag_path) as domain_reader:
             domain_reader.read_in_flags()
             self.all_flag_names += domain_reader.get_flags()
-            self.domain_flag_defaults = domain_reader.get_default_values()
+            self.domain_flag_default = domain_reader.get_default_values()
 
         flag_domain_mapping = domain_reader.get_domains()
         for flag_name, domain in flag_domain_mapping.items():
           self.flag_domains[flag_name] = domain
+
+    def remove_flag(self, flag_name: str) -> None:
+        self.all_flag_names.remove(flag_name)
+        del self.flag_domains[flag_name]
+        del self.domain_flag_default[flag_name]
 
     def get_all_flag_names(self) -> list[str]:
         """Returns a list of all the flag names"""
@@ -37,7 +42,7 @@ class Flags:
 
     def get_domain_flag_defaults(self) -> dict[str, str]:
         """Returns a dictionary mapping each flag name to its default value"""
-        return self.domain_flag_defaults
+        return self.domain_flag_default
 
     def get_all_flag_domains(self) -> dict[str, str|list[str]|list[bool]]:
         """Returns a dictionary mapping all flag names to the domains that can be applied to them"""
