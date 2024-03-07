@@ -101,6 +101,7 @@ class FlagOptimisationController:
 
         # TODO: Add printed information about the fact that this is an anytime optimisation algorithm
         try:
+            print("Using anytime algorithm for optimisation, press ^C to stop and return flags")
             signal.signal(signal.SIGINT, return_results)
 
             # Manager object used to coordinate shared value and lock across objects - ensures end result is only printed once
@@ -114,7 +115,7 @@ class FlagOptimisationController:
                 return optimiser.continuous_optimise(benchmark_obj)
 
         except KeyboardInterrupt:
-            print("Interrupted")
+            pass
 
         except ReturnToMain:
             return optimiser.get_fastest_flags()
@@ -166,7 +167,7 @@ if __name__ == '__main__':
                            action='store_true',
                            help="Skip comparing with 03 flags after the optimisation of the flag choices has finished.")
 
-    argparser.add_argument("-std --dont-use-standard-breaking-flags",
+    argparser.add_argument("-std","--dont-use-standard-breaking-flags",
                            dest="dont_use_standard_breaking_flags",
                            action='store_true',
                            help="Do not use the flags that break the c++ standard")
