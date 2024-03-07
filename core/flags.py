@@ -3,7 +3,7 @@ from reader import binary_flag_reader, domain_flag_reader
 class Flags:
     all_flag_names: list[str]
     flag_domains: dict[str, str|list[str]|list[bool]]
-    domain_flag_default: dict[str, str]
+    domain_flag_default: dict[str, str|bool]
 
     def __init__(self):
         self.all_flag_names = []
@@ -16,24 +16,28 @@ class Flags:
         :param binary_flag_path: The path for information about the binary flags (a .txt file)
         :param domain_flag_path: The path for information about the domain flags (a .json file)
         """
+        # Get names and set domains/defaults of binary flags
         with binary_flag_reader.BinaryFlagReader(binary_flag_path) as bin_flags_reader:
             bin_flags_reader.read_in_flags()
             self.all_flag_names += bin_flags_reader.get_flags()
             for flag_name in self.all_flag_names:
                 self.flag_domains[flag_name] = [True, False]
-                # Automatically set flags to false
+                # Automatically set flags to false - a "blank slate" being the default
                 self.domain_flag_default[flag_name] = False
 
+        # Get names and default values of the domain flags
         with domain_flag_reader.DomainFlagReader(domain_flag_path) as domain_reader:
             domain_reader.read_in_flags()
             self.all_flag_names += domain_reader.get_flags()
-            self.domain_flag_default = domain_reader.get_default_values()
+            self.domain_flag_default.update(domain_reader.get_default_values())
 
+        # Get and assign domains of domain flags
         flag_domain_mapping = domain_reader.get_domains()
         for flag_name, domain in flag_domain_mapping.items():
           self.flag_domains[flag_name] = domain
 
     def remove_flag(self, flag_name: str) -> None:
+        """ Remove a flag from the object"""
         if flag_name in self.all_flag_names:
             self.all_flag_names.remove(flag_name)
             if flag_name in self.flag_domains.keys():
