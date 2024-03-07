@@ -22,8 +22,7 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
     def __init__(self,
                  flags_to_optimise: Flags,
                  n_population: int = 5,
-                 starting_population: list[dict[str, bool|str]] = None,
-                 **kwargs):
+                 starting_population: list[dict[str, bool|str]] = None):
         #TODO: Document kwargs
         super().__init__(flags_to_optimise)
         # Setup initial random population
