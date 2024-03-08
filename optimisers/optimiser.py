@@ -14,7 +14,6 @@ class FlagOptimiser(ABC):
     states_explored: int = 0
 
     def __init__(self, flags: Flags):
-        #TODO: Consider changing this to a random choice of flags (defensive flags and completeness)
         self.fastest_flags = get_random_flag_sample(flags)
         self.current_flags = get_random_flag_sample(flags)
         self.fastest_time = float('inf')
