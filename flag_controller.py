@@ -186,9 +186,8 @@ if __name__ == '__main__':
     if dont_compare_o3:
         pass
     else:
-        print("Please Wait while your flags are compared with that of -03")
-        benchmarker.compare_two_flag_choices(
-            opt_flag1=create_flag_string(fastest_flags),
-            opt_flag2=create_flag_string(o3_flags))
-
+        print("\nPlease wait for your flags to be compared with that of -03")
+        benchmarker.compare_with_o3(
+            optimised_flags=create_flag_string(fastest_flags),
+            o3_flags=create_flag_string(o3_flags))
     sys.exit(0)
