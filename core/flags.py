@@ -44,6 +44,16 @@ class Flags:
                 del self.flag_domains[flag_name]
                 del self.domain_flag_default[flag_name]
 
+    def add_flag(self, flag_name: str, domain, default_value) -> None:
+        if not(flag_name in self.all_flag_names):
+            self.all_flag_names.append(flag_name)
+
+        if not(flag_name in self.flag_domains.keys()):
+            self.flag_domains[flag_name] = domain
+
+        if not(flag_name in self.domain_flag_default.keys()):
+            self.domain_flag_default[flag_name] = default_value
+
     def get_all_flag_names(self) -> list[str]:
         """Returns a list of all the flag names"""
         return self.all_flag_names
@@ -59,3 +69,6 @@ class Flags:
     def get_flag_domain(self, flag_name: str) -> str|list[str]|list[bool]:
         """Returns a domain given a specific flag name"""
         return self.flag_domains[flag_name]
+
+    def get_flag_default(self, flag_name: str) -> str|bool:
+        return self.domain_flag_default[flag_name]
