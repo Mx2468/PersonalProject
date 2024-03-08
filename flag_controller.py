@@ -162,6 +162,7 @@ if __name__ == '__main__':
     for domain_flag, value in o3_flags_obj.get_domain_flag_defaults().items():
         o3_flags[domain_flag] = value
 
+    # By itself, the flags combination for 03 mentioned in the GCC page causes errors - this needs to be validated
     o3_flags = validate_flag_choices(o3_flags)
 
     if dont_start_o3:
@@ -190,4 +191,5 @@ if __name__ == '__main__':
         benchmarker.compare_with_o3(
             optimised_flags=create_flag_string(fastest_flags),
             o3_flags=create_flag_string(o3_flags))
+        print("Press ^C again to exit")
     sys.exit(0)
