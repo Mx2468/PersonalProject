@@ -5,10 +5,9 @@ import sys
 from helpers.cli_arguments import get_cli_arguments
 from optimisers import *
 import signal
-from helpers import constants, Benchmarker
+from helpers import constants
+from core.benchmarking import Benchmarker
 from multiprocessing import Manager
-
-import argparse
 
 # Sets up global variables for lock and value for processess to commuinicate
 def init_globals(flag, lock):
@@ -17,11 +16,13 @@ def init_globals(flag, lock):
     global_flag = flag
     global_lock = lock
 
+#TODO: Export this into another module for modularity
 def dump_flags(filename: str, flags: dict[str, bool|str]) -> None:
     print(f"Writing flag choices to {filename}")
+
     with open(filename, 'w') as file_obj:
         for flag_name, value in flags.items():
-            file_obj.write(f"{flag_name}={value}\n")
+            file_obj.write(f"{flag_name}={value} ")
 
 
 # Instance of Exception with a readable name to handle returning to

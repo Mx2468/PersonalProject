@@ -2,7 +2,9 @@
 import helpers
 from core.flags import Flags
 from optimisers.optimiser import FlagOptimiser
-from helpers import validate_flag_choices, create_flag_string, Benchmarker
+from core.benchmarking import Benchmarker
+from core.validation import validate_flag_choices
+from helpers import create_flag_string
 
 
 class RandomSearchOptimiser(FlagOptimiser):

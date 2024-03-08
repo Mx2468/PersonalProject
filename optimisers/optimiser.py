@@ -2,7 +2,8 @@
 from abc import ABC, abstractmethod
 
 from core.flags import Flags
-from helpers import Benchmarker, get_random_flag_sample
+from core.benchmarking import Benchmarker
+from helpers import get_random_flag_sample
 
 
 class FlagOptimiser(ABC):
