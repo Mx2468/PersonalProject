@@ -185,7 +185,6 @@ if __name__ == '__main__':
     binary_input_flags = str(parsed_args.b_input_flags)
     domain_input_flags = str(parsed_args.d_input_flags)
     dont_start_o3 = parsed_args.dont_start_o3
-    # TODO: Implement not comparing O3 flags
     dont_compare_o3 = parsed_args.dont_compare_o3
     dont_use_standard_breaking_flags = parsed_args.dont_use_standard_breaking_flags
 
@@ -197,39 +196,40 @@ if __name__ == '__main__':
     benchmarker = Benchmarker(input_source_code_file)
 
     # TODO: Implement a reader to load these flags in as true/their default values as provided to allow them to be used directly
+    o3_flags_obj = Flags()
+    o3_flags_obj.load_in_flags("./flags/O3_flags.txt", "./flags/o3_domain_flags.json")
+    all_flags = controller.flags.get_all_flag_names()
+    o3_flag_names = o3_flags_obj.get_all_flag_names()
+    for flag in all_flags:
+        o3_flags_obj.add_flag(flag, controller.flags.get_flag_domain(flag),
+                              controller.flags.get_flag_default(flag))
+
+    o3_flags = {bin_flag: True for bin_flag in o3_flags_obj.get_all_flag_names()}
+    for domain_flag, value in o3_flags_obj.get_domain_flag_defaults().items():
+        o3_flags[domain_flag] = value
+
     if dont_start_o3:
         flags_to_start = []
     else:
-        o3_flags_obj = Flags()
-        o3_flags_obj.load_in_flags("./flags/O3_flags.txt", "./flags/o3_domain_flags.json")
-        all_flags = controller.flags.get_all_flag_names()
-        o3_flag_names = o3_flags_obj.get_all_flag_names()
-        for flag in all_flags:
-            if not(flag in o3_flag_names):
-                o3_flags_obj.all_flag_names.append(flag)
-                o3_flags_obj.flag_domains[flag] = controller.flags.get_flag_domain(flag)
-
-        # TODO: Implement adding flag data instead of this messy implementation
-        o3_flags_obj.domain_flag_default.update(controller.flags.get_domain_flag_defaults())
-
-        o3_flags = {bin_flag: True for bin_flag in o3_flags_obj.get_all_flag_names()}
-        for domain_flag, value in o3_flags_obj.get_domain_flag_defaults().items():
-            o3_flags[domain_flag] = value
-
         flags_to_start = [validate_flag_choices(o3_flags)]
 
     if opt_method == "Genetic":
         optimiser = GeneticAlgorithmOptimiser(controller.flags, starting_population=flags_to_start)
     else:
         optimiser = RandomSearchOptimiser(controller.flags)
+
     if opt_steps is None or opt_steps <= 0:
         fastest_flags = controller.anytime_optimisation(optimiser, benchmarker)
     else:
         fastest_flags = controller.contract_optimisation(opt_steps, optimiser, benchmarker)
 
-    # print("Please Wait while your flags are compared with that of -03")
-    #
-    # benchmarker.compare_two_flag_choices(
-    #     opt_flag1=create_flag_string(fastest_flags),
-    #     opt_flag2=create_flag_string(o3_flags))
+    if dont_compare_o3:
+        pass
+    else:
+        print("Please Wait while your flags are compared with that of -03")
+
+        benchmarker.compare_two_flag_choices(
+            opt_flag1=create_flag_string(fastest_flags),
+            opt_flag2=create_flag_string(o3_flags))
+
     sys.exit(0)
