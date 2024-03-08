@@ -2,6 +2,7 @@
 import os
 import sys
 
+from helpers.cli_arguments import get_cli_arguments
 from optimisers import *
 import signal
 from helpers import constants, Benchmarker
@@ -122,63 +123,10 @@ class FlagOptimisationController:
 
 # TODO: Add run scripts for a variety of necessary scenarios
 # TODO: Change as many class attributes as possible to private
-# TODO: Update Random optimiser to comply with how program should run
 if __name__ == '__main__':
     # Define all input arguments
 
-    # TODO: Refactor this to another file to make this script more readable
-    argparser = argparse.ArgumentParser(prog="Compiler flag optimiser",
-                            description="A piece of software to optimise the optimisation options for the g++ compiler, given an input c++ file.")
-
-    argparser.add_argument("-i", "--input",
-                           dest="input",
-                           help="Path to the input c++ file to optimise flag choices for.")
-
-    argparser.add_argument("-bf", "--binary-flags",
-                           dest="b_input_flags",
-                           help="Paths to the binary (true/false) input flags as a .txt file.",
-                           default="./flags/binary_flags.txt")
-
-    argparser.add_argument("-df", "--domain-flags",
-                           dest="d_input_flags",
-                           help="Path to the domain flags file (.json format).",
-                           default="./flags/domain_flags.json")
-
-    argparser.add_argument("-o", "--output",
-                           dest="output",
-                           help="Path to the output file to write the flag choices to.",
-                           default="flags_dump.txt")
-
-    argparser.add_argument("-m", "--method",
-                           dest="method",
-                           help="Optimisation method used to optimise the flag choices.",
-                           choices=["random", "genetic"],
-                           default="genetic")
-
-    argparser.add_argument("-n", "--opt-steps",
-                           dest="opt_steps",
-                           help="Number of optimisation steps to run. No value or a value below 1 means an anytime-algorithm will run.")
-
-    argparser.add_argument("--num-code-runs",
-                           dest="n_code_runs",
-                           help="Number of code runs used to benchmark the ")
-
-    argparser.add_argument("--dont-start-with-o3",
-                           dest="dont_start_o3",
-                           action='store_true',
-                           help="Do not start with 03 flags as a base.")
-
-    argparser.add_argument("--dont-compare-with-o3",
-                           dest="dont_compare_o3",
-                           action='store_true',
-                           help="Skip comparing with 03 flags after the optimisation of the flag choices has finished.")
-
-    argparser.add_argument("-std","--dont-use-standard-breaking-flags",
-                           dest="dont_use_standard_breaking_flags",
-                           action='store_true',
-                           help="Do not use the flags that break the c++ standard")
-
-    parsed_args = argparser.parse_args()
+    parsed_args = get_cli_arguments()
 
     # Read in all arguments
     input_source_code_file = str(parsed_args.input)
@@ -215,18 +163,20 @@ if __name__ == '__main__':
         o3_flags[domain_flag] = value
 
     o3_flags = validate_flag_choices(o3_flags)
-    print(o3_flags["-flive-patching"])
-    print(o3_flags["-flto"])
 
     if dont_start_o3:
         flags_to_start = []
     else:
         flags_to_start = [o3_flags]
 
-    if opt_method == "Genetic":
+    if opt_method == "genetic":
+        print("Using a genetic algorithm")
         optimiser = GeneticAlgorithmOptimiser(controller.flags, starting_population=flags_to_start)
-    else:
+    elif opt_method == "random":
+        print("Using random search")
         optimiser = RandomSearchOptimiser(controller.flags)
+    else:
+        raise ValueError("Invalid optimization method provided, only 'genetic' and 'random' are supported ")
 
     if opt_steps is None or opt_steps <= 0:
         fastest_flags = controller.anytime_optimisation(optimiser, benchmarker)
