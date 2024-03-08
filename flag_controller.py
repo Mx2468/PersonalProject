@@ -122,9 +122,11 @@ class FlagOptimisationController:
 
 # TODO: Add run scripts for a variety of necessary scenarios
 # TODO: Change as many class attributes as possible to private
-# TODO: Validate input file to ensure it is a valid .cpp file
 # TODO: Update Random optimiser to comply with how program should run
 if __name__ == '__main__':
+    # Define all input arguments
+
+    # TODO: Refactor this to another file to make this script more readable
     argparser = argparse.ArgumentParser(prog="Compiler flag optimiser",
                             description="A piece of software to optimise the optimisation options for the g++ compiler, given an input c++ file.")
 
@@ -178,6 +180,7 @@ if __name__ == '__main__':
 
     parsed_args = argparser.parse_args()
 
+    # Read in all arguments
     input_source_code_file = str(parsed_args.input)
     output_file = parsed_args.output
     opt_method = parsed_args.method
@@ -187,6 +190,9 @@ if __name__ == '__main__':
     dont_start_o3 = parsed_args.dont_start_o3
     dont_compare_o3 = parsed_args.dont_compare_o3
     dont_use_standard_breaking_flags = parsed_args.dont_use_standard_breaking_flags
+
+    # Make sure input source code is a c++ file - checks some of the most common c++ file endings.
+    assert input_source_code_file.endswith((".cpp", ".C", ".cc")), "The input file must be a valid c++ file"
 
     controller = FlagOptimisationController(binary_input_flags,
                                             domain_input_flags,
@@ -208,10 +214,14 @@ if __name__ == '__main__':
     for domain_flag, value in o3_flags_obj.get_domain_flag_defaults().items():
         o3_flags[domain_flag] = value
 
+    o3_flags = validate_flag_choices(o3_flags)
+    print(o3_flags["-flive-patching"])
+    print(o3_flags["-flto"])
+
     if dont_start_o3:
         flags_to_start = []
     else:
-        flags_to_start = [validate_flag_choices(o3_flags)]
+        flags_to_start = [o3_flags]
 
     if opt_method == "Genetic":
         optimiser = GeneticAlgorithmOptimiser(controller.flags, starting_population=flags_to_start)
@@ -227,7 +237,6 @@ if __name__ == '__main__':
         pass
     else:
         print("Please Wait while your flags are compared with that of -03")
-
         benchmarker.compare_two_flag_choices(
             opt_flag1=create_flag_string(fastest_flags),
             opt_flag2=create_flag_string(o3_flags))
