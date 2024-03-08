@@ -88,7 +88,6 @@ class Benchmarker:
         for i in range(start, end):
             yield ''.join([DEFAULT_COMPILED_FILE_NAME, str(i+1)])
 
-    #TODO: Base this on the number of cores in a machine
     def parallel_benchmark_flags(self, flag_string_to_benchmark: str, n_runs: int = N_BENCHMARK_RUNS) -> float:
         # Try-except statement used to prevent all current threads from printing the interrupt handling message
         output_names = list(islice(self.generate_unique_outputfile_names(0, n_runs), n_runs))
