@@ -65,12 +65,20 @@ class Benchmarker:
         self.GLOBAL_COUNTER += 1
         return name
 
+    def compare_with_o3(self, optimised_flags: str, o3_flags: str) -> None:
+        opt_flag_time = self.parallel_benchmark_flags(optimised_flags)
+        o3_flag_time = self.parallel_benchmark_flags(o3_flags)
+
+        if opt_flag_time < o3_flag_time:
+            print("The optimised flags are faster than -O3")
+        else:
+            print("The optimised flags perform the same or worse than -O3")
+
     def compare_two_flag_choices(self, opt_flag1: str, opt_flag2: str ) -> None:
         flags_time1 = self.parallel_benchmark_flags(opt_flag1)
         flags_time2 = self.parallel_benchmark_flags(opt_flag2)
         print(f"Flags time 1: {flags_time1}")
         print(f"Flags time 2: {flags_time2}")
-        return
 
     @staticmethod
     def generate_unique_outputfile_names(start: int, end: int):
