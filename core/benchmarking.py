@@ -91,7 +91,7 @@ class Benchmarker:
         """
 
         opt_flag_time = self.parallel_benchmark_flags(optimised_flags)
-        o3_flag_time = self.parallel_benchmark_flags("-O3")
+        o3_flag_time = self.parallel_benchmark_flags(o3_flags)
 
         print(f"\nOptimised flag time {opt_flag_time}")
         print(f"O3 flag time {o3_flag_time}")
