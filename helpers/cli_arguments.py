@@ -1,4 +1,5 @@
 import argparse
+import helpers.constants as constants
 
 def get_cli_arguments():
     """Defines, parses and returns the program's CLI arguments/flags"""
@@ -12,12 +13,12 @@ def get_cli_arguments():
     argparser.add_argument("-bf", "--binary-flags",
                            dest="b_input_flags",
                            help="Paths to the binary (true/false) input flags as a .txt file.",
-                           default="./flags/binary_flags.txt")
+                           default=constants.ALL_BINARY_FLAGS_PATH)
 
     argparser.add_argument("-df", "--domain-flags",
                            dest="d_input_flags",
                            help="Path to the domain flags file (.json format).",
-                           default="./flags/domain_flags.json")
+                           default=constants.ALL_DOMAIN_FLAGS_PATH)
 
     argparser.add_argument("-o", "--output",
                            dest="output",
