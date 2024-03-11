@@ -2,6 +2,7 @@
 import os
 import sys
 
+from exporter.flag_choices import FlagChoicesExporter
 from helpers.cli_arguments import get_cli_arguments
 from optimisers import *
 import signal
@@ -15,15 +16,6 @@ def init_globals(flag, lock):
     global global_lock
     global_flag = flag
     global_lock = lock
-
-#TODO: Export this into another module for modularity
-def dump_flags(filename: str, flags: dict[str, bool|str]) -> None:
-    print(f"Writing flag choices to {filename}")
-
-    with open(filename, 'w') as file_obj:
-        for flag_name, value in flags.items():
-            file_obj.write(f"{flag_name}={value} ")
-
 
 # Instance of Exception with a readable name to handle returning to
 class ReturnToMain(Exception):
@@ -75,7 +67,9 @@ class FlagOptimisationController:
         print(f"Fastest Time: {optimiser.fastest_time}s")
         print(f"Fastest Flags: {create_flag_string(optimiser.fastest_flags)}")
         global output_file
-        dump_flags(output_file, optimiser.fastest_flags)
+        exporter = FlagChoicesExporter(output_file, optimiser.fastest_flags)
+        with exporter:
+            exporter.export_flags()
         return optimiser.fastest_flags
 
     def anytime_optimisation(self,
@@ -91,7 +85,7 @@ class FlagOptimisationController:
         def return_results(*args) -> None:
             # Global value used between threads to make sure this message is only printed once
             # (i.e. by only one thread)
-            with global_lock:
+            with ((global_lock)):
                 if global_flag.value == 0:
                     global_flag.value = 1
                     print('You pressed ^C!')
@@ -99,7 +93,9 @@ class FlagOptimisationController:
                     print(f"Fastest Time: {optimiser.fastest_time}s")
                     print(f"Fastest Flags: {create_flag_string(optimiser.fastest_flags)}")
                     global output_file
-                    dump_flags(output_file, optimiser.fastest_flags)
+                    exporter = FlagChoicesExporter(output_file, optimiser.fastest_flags)
+                    with exporter:
+                        exporter.export_flags()
                     raise ReturnToMain
 
         try:
