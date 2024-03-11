@@ -7,13 +7,9 @@ from helpers import get_random_flag_sample, create_flag_string, get_random_indiv
 from optimisers.optimiser import FlagOptimiser
 import numpy as np
 
-class GeneticAlgorithmOptimiser(FlagOptimiser):
+from optimisers.config import genetic_algorithm_config
 
-    #TODO: Move these parameters to a config file
-    MUTATION_RATE = 0.05
-    MIXING_NUMBER = 3
-    ELITISM_ENABLED = True
-    ELITISM_NUMBER_CARRIED = 2
+class GeneticAlgorithmOptimiser(FlagOptimiser):
     _n_population: int = 10
     _current_flags: list[dict[str, bool]] = []
     _random_generator: np.random.Generator = np.random.default_rng()
@@ -21,8 +17,9 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
 
     def __init__(self,
                  flags_to_optimise: Flags,
-                 n_population: int = 10,
+                 n_population: int = genetic_algorithm_config.INITIAL_POPULATION_SIZE,
                  starting_population: list[dict[str, bool|str]] = None):
+
         super().__init__(flags_to_optimise)
         # Setup initial random population
         self._flags_object = flags_to_optimise
@@ -36,6 +33,11 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
             flags_to_add = n_population - len(self._current_flags)
             self._current_flags += [validate_flag_choices(get_random_flag_sample(self._flags_object))
                                     for i in range(flags_to_add)]
+
+        self.ELITISM_ENABLED = genetic_algorithm_config.ELITISM_ENABLED
+        self.ELITISM_NUMBER_CARRIED = genetic_algorithm_config.ELITISM_NUMBER_CARRIED
+        self.MUTATION_RATE = genetic_algorithm_config.MUTATION_RATE
+        self.MIXING_NUMBER = genetic_algorithm_config.MIXING_NUMBER
 
 
     def continuous_optimise(self, benchmarker: Benchmarker) -> dict[str, bool]:
