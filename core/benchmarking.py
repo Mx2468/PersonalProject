@@ -23,7 +23,11 @@ class Benchmarker:
     def compile_with_flags(self,
                            output_file_name: str,
                            opt_flag: str) -> str:
-        """Compile a c++ source code file with the specified flags"""
+        """
+        Compile a c++ source code file with the specified flags
+        :param output_file_name: The name of the compiled executable file at the end of the compilation process
+        :param opt_flag: The string of optimisation flags to use for the compilation process
+        """
         if os.path.exists(output_file_name):
             os.remove(output_file_name)
 
@@ -39,6 +43,8 @@ class Benchmarker:
         """
         Compiles a source file with given flag choices
         and returns the benchmark time of the compiled code
+        :param opt_flag: The string of optimisation flags to use for the benchmarking
+        :param number_of_runs: The number of runs over which to average the compilation process
         """
         compiled_code_name = self.compile_with_flags(self.COMPILED_CODE_FILE, opt_flag)
         return self.time_needed(number_of_runs, self.run_compiled_code, compiled_code_name)
@@ -47,7 +53,12 @@ class Benchmarker:
     def time_needed(number_of_repetitions: int,
                     function_to_run: callable,
                     output_file_name: str) -> float:
-        """For measuring time for a function to run"""
+        """
+        For measuring time for a function to run
+        :param number_of_repetitions: The number of runs over which the runtime is averaged
+        :param function_to_run: The function that runs the code (self.run_compiled_code)
+        :param output_file_name: The name of the compiled executable file
+        """
         for j in range(number_of_repetitions):
             start = time()
             function_to_run(output_file_name)
@@ -57,17 +68,30 @@ class Benchmarker:
 
 
     def run_compiled_code(self, *args) -> None:
-        """Executes the compiled code file """
+        """Executes the compiled code file, where the first argument in *args
+         should be the name of the compiled executable file to run"""
+        # DEVNULL used to supress stdout - removes unnecessary prints
+        # clogging up the console and obstructing optimisation information
         subprocess.run(f"./{args[0]}", shell=True, cwd=os.getcwd(), stdout=subprocess.DEVNULL)
 
     def get_fresh_file_name(self) -> str:
+        """
+        Returns a unique name for the compiled executable file to run
+        :return: The name of the compiled executable as a string
+        """
         name = self.COMPILED_CODE_FILE + str(self.GLOBAL_COUNTER)
         self.GLOBAL_COUNTER += 1
         return name
 
     def compare_with_o3(self, optimised_flags: str, o3_flags: str) -> None:
+        """
+        Benchmarks and compares a given set of flag choices with -O3 flags.
+        :param optimised_flags: A string of the optimised flags
+        :param o3_flags:
+        """
+
         opt_flag_time = self.parallel_benchmark_flags(optimised_flags)
-        o3_flag_time = self.parallel_benchmark_flags(o3_flags)
+        o3_flag_time = self.parallel_benchmark_flags("-O3")
 
         print(f"\nOptimised flag time {opt_flag_time}")
         print(f"O3 flag time {o3_flag_time}")
@@ -78,6 +102,11 @@ class Benchmarker:
             print("The optimised flags perform the same or worse than -O3")
 
     def compare_two_flag_choices(self, opt_flag1: str, opt_flag2: str ) -> None:
+        """
+        A function to compare two different strings of flag choices
+        :param opt_flag1: The first set of flag choices
+        :param opt_flag2: The second set of flag choices
+        """
         flags_time1 = self.parallel_benchmark_flags(opt_flag1)
         flags_time2 = self.parallel_benchmark_flags(opt_flag2)
         print(f"Flags time 1: {flags_time1}")
@@ -85,10 +114,22 @@ class Benchmarker:
 
     @staticmethod
     def generate_unique_outputfile_names(start: int, end: int):
+        """
+        Generates a set of unique output file names for multiple threads
+        :param start: The beginning number of the range of numbers to use in the file names
+        :param end: The end number of the range of numbers to use in the file names
+        :return: A generator of unique file names, using the range provided
+        """
         for i in range(start, end):
             yield ''.join([DEFAULT_COMPILED_FILE_NAME, str(i+1)])
 
     def parallel_benchmark_flags(self, flag_string_to_benchmark: str, n_runs: int = N_BENCHMARK_RUNS) -> float:
+        """
+        Run and benchmark a flag string in parallel
+        :param flag_string_to_benchmark: The string of optimisation flags to benchmark
+        :param n_runs: The number of benchmark runs to run in parallel and average the result over
+        :return: The averaged time taken to run the program with the given flags
+        """
         # Try-except statement used to prevent all current threads from printing the interrupt handling message
         output_names = list(islice(self.generate_unique_outputfile_names(0, n_runs), n_runs))
         with Pool(n_runs) as pool:
