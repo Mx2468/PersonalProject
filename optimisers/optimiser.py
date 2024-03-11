@@ -8,16 +8,16 @@ from helpers import get_random_flag_sample
 
 class FlagOptimiser(ABC):
     """A class to define an optimiser of binary (on/off) flags"""
-    fastest_flags: dict[str, bool] = {}
-    current_flags: dict[str, bool] = {}
-    fastest_time: float
-    opt_steps_done: int = 0
-    states_explored: int = 0
+    _fastest_flags: dict[str, bool] = {}
+    _current_flags: dict[str, bool] = {}
+    _fastest_time: float
+    _opt_steps_done: int = 0
+    _states_explored: int = 0
 
     def __init__(self, flags: Flags):
-        self.fastest_flags = get_random_flag_sample(flags)
-        self.current_flags = get_random_flag_sample(flags)
-        self.fastest_time = float('inf')
+        self._fastest_flags = get_random_flag_sample(flags)
+        self._current_flags = get_random_flag_sample(flags)
+        self._fastest_time = float('inf')
 
     @abstractmethod
     def continuous_optimise(self, benchmarker: Benchmarker) -> dict[str, bool]:
@@ -48,16 +48,16 @@ class FlagOptimiser(ABC):
         raise NotImplementedError
 
     def print_optimisation_info(self):
-        print(f"Number of optimisation steps: {self.opt_steps_done}")
-        print(f"Number of states explored: {self.states_explored}")
-        print(f"Fastest time so far: {self.fastest_time}")
+        print(f"Number of optimisation steps: {self._opt_steps_done}")
+        print(f"Number of states explored: {self._states_explored}")
+        print(f"Fastest time so far: {self._fastest_time}")
 
     def get_fastest_flags(self) -> dict[str, bool]:
         """Returns the current fastest flags of the optimiser"""
-        return self.current_flags
+        return self._current_flags
 
     def get_fastest_time(self) -> float:
-        return self.fastest_time
+        return self._fastest_time
 
     def get_n_states_explored(self) -> int:
-        return self.states_explored
+        return self._states_explored

@@ -19,12 +19,12 @@ class RandomSearchOptimiser(FlagOptimiser):
 
     def continuous_optimise(self, benchmark_obj: Benchmarker) -> dict[str, bool]:
         # Explores the state space until it is done (as part of an anytime algorithm)
-        while self.states_explored < 2 ** len(self.current_flags.keys()):
+        while self._states_explored < 2 ** len(self._current_flags.keys()):
             self.optimisation_step(benchmark_obj)
 
         # Clean up class for next optimisation run before returning flags
-        flags_to_return = self.fastest_flags
-        self.clear_between_runs()
+        flags_to_return = self._fastest_flags
+        self._clear_between_runs()
         return flags_to_return
 
     def n_steps_optimise(self, benchmark_obj: Benchmarker, n: int) -> dict[str, bool]:
@@ -40,29 +40,29 @@ class RandomSearchOptimiser(FlagOptimiser):
             self.optimisation_step(benchmark_obj)
 
         # Clean up class for next optimisation run before returning flags
-        flags_to_return = self.fastest_flags
-        self.clear_between_runs()
+        flags_to_return = self._fastest_flags
+        self._clear_between_runs()
         return flags_to_return
 
     def optimisation_step(self, benchmark_obj: Benchmarker) -> None:
-        self.current_flags = self.get_random_flags()
+        self._current_flags = self.get_random_flags()
 
-        validated_flag_choice = validate_flag_choices(self.current_flags)
+        validated_flag_choice = validate_flag_choices(self._current_flags)
         current_time = benchmark_obj.benchmark_flag_choices(
             opt_flag=create_flag_string(validated_flag_choice))
 
-        if self.fastest_time is None or current_time < self.fastest_time:
-            self.fastest_time = current_time
-            self.fastest_flags = self.current_flags
+        if self._fastest_time is None or current_time < self._fastest_time:
+            self._fastest_time = current_time
+            self._fastest_flags = self._current_flags
 
-        self.states_explored += 1
-        self.opt_steps_done += 1
+        self._states_explored += 1
+        self._opt_steps_done += 1
         self.print_optimisation_info()
 
 
-    def clear_between_runs(self):
+    def _clear_between_runs(self):
         """ Clears all the lingering state in the class between optimisation runs """
-        self.fastest_flags = {}
-        self.current_flags = {}
-        self.fastest_time = float('inf')
-        self.states_explored = 0
+        self._fastest_flags = {}
+        self._current_flags = {}
+        self._fastest_time = float('inf')
+        self._states_explored = 0

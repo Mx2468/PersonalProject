@@ -65,12 +65,13 @@ class FlagOptimisationController:
         print('The optimisation process finished')
         print(f"States Explored: {optimiser.get_n_states_explored()}")
         print(f"Fastest Time: {optimiser.get_fastest_time()}s")
-        print(f"Fastest Flags: {create_flag_string(optimiser.fastest_flags)}")
+        print(f"Fastest Flags: {create_flag_string(optimiser.get_fastest_flags())}")
         global output_file
-        exporter = FlagChoicesExporter(output_file, optimiser.fastest_flags)
+        optimised_flags = optimiser.get_fastest_flags()
+        exporter = FlagChoicesExporter(output_file, optimised_flags)
         with exporter:
             exporter.export_flags()
-        return optimiser.fastest_flags
+        return optimised_flags
 
     def anytime_optimisation(self,
                              optimiser: FlagOptimiser,
@@ -85,15 +86,16 @@ class FlagOptimisationController:
         def return_results(*args) -> None:
             # Global value used between threads to make sure this message is only printed once
             # (i.e. by only one thread)
-            with ((global_lock)):
+            with (global_lock):
                 if global_flag.value == 0:
                     global_flag.value = 1
                     print('You pressed ^C!')
                     print(f"States Explored: {optimiser.get_n_states_explored()}")
                     print(f"Fastest Time: {optimiser.get_fastest_time()}s")
-                    print(f"Fastest Flags: {create_flag_string(optimiser.fastest_flags)}")
+                    fastest_flags = optimiser.get_fastest_flags()
+                    print(f"Fastest Flags: {create_flag_string(fastest_flags)}")
                     global output_file
-                    exporter = FlagChoicesExporter(output_file, optimiser.fastest_flags)
+                    exporter = FlagChoicesExporter(output_file, fastest_flags)
                     with exporter:
                         exporter.export_flags()
                     raise ReturnToMain
