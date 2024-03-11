@@ -63,8 +63,8 @@ class FlagOptimisationController:
         print(f"Running optimisation for {n_steps} steps")
         optimiser.n_steps_optimise(benchmark_obj, n_steps)
         print('The optimisation process finished')
-        print(f"States Explored: {optimiser.states_explored}")
-        print(f"Fastest Time: {optimiser.fastest_time}s")
+        print(f"States Explored: {optimiser.get_n_states_explored()}")
+        print(f"Fastest Time: {optimiser.get_fastest_time()}s")
         print(f"Fastest Flags: {create_flag_string(optimiser.fastest_flags)}")
         global output_file
         exporter = FlagChoicesExporter(output_file, optimiser.fastest_flags)
@@ -89,8 +89,8 @@ class FlagOptimisationController:
                 if global_flag.value == 0:
                     global_flag.value = 1
                     print('You pressed ^C!')
-                    print(f"States Explored: {optimiser.states_explored}")
-                    print(f"Fastest Time: {optimiser.fastest_time}s")
+                    print(f"States Explored: {optimiser.get_n_states_explored()}")
+                    print(f"Fastest Time: {optimiser.get_fastest_time()}s")
                     print(f"Fastest Flags: {create_flag_string(optimiser.fastest_flags)}")
                     global output_file
                     exporter = FlagChoicesExporter(output_file, optimiser.fastest_flags)
@@ -129,7 +129,7 @@ if __name__ == '__main__':
     input_source_code_file = str(parsed_args.input)
     output_file = parsed_args.output
     opt_method = parsed_args.method
-    opt_steps = parsed_args.opt_steps
+    opt_steps = int(parsed_args.opt_steps)
     binary_input_flags = str(parsed_args.b_input_flags)
     domain_input_flags = str(parsed_args.d_input_flags)
     dont_start_o3 = parsed_args.dont_start_o3

@@ -55,3 +55,9 @@ class FlagOptimiser(ABC):
     def get_fastest_flags(self) -> dict[str, bool]:
         """Returns the current fastest flags of the optimiser"""
         return self.current_flags
+
+    def get_fastest_time(self) -> float:
+        return self.fastest_time
+
+    def get_n_states_explored(self) -> int:
+        return self.states_explored

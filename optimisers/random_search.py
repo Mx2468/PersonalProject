@@ -12,10 +12,10 @@ class RandomSearchOptimiser(FlagOptimiser):
 
     def __init__(self, flags_to_optimise: Flags):
         super().__init__(flags_to_optimise)
-        self.flags_object = flags_to_optimise
+        self.__flags_object = flags_to_optimise
 
     def get_random_flags(self, flags: dict[str, bool]) -> dict[str, bool]:
-        return validate_flag_choices(helpers.get_random_flag_sample(self.flags_object))
+        return validate_flag_choices(helpers.get_random_flag_sample(self.__flags_object))
 
     def continuous_optimise(self, benchmark_obj: Benchmarker) -> dict[str, bool]:
         # Explores the state space until it is done (as part of an anytime algorithm)
