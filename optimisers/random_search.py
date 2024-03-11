@@ -14,7 +14,7 @@ class RandomSearchOptimiser(FlagOptimiser):
         super().__init__(flags_to_optimise)
         self.__flags_object = flags_to_optimise
 
-    def get_random_flags(self, flags: dict[str, bool]) -> dict[str, bool]:
+    def get_random_flags(self) -> dict[str, bool]:
         return validate_flag_choices(helpers.get_random_flag_sample(self.__flags_object))
 
     def continuous_optimise(self, benchmark_obj: Benchmarker) -> dict[str, bool]:
@@ -45,7 +45,7 @@ class RandomSearchOptimiser(FlagOptimiser):
         return flags_to_return
 
     def optimisation_step(self, benchmark_obj: Benchmarker) -> None:
-        self.current_flags = self.get_random_flags(self.current_flags)
+        self.current_flags = self.get_random_flags()
 
         validated_flag_choice = validate_flag_choices(self.current_flags)
         current_time = benchmark_obj.benchmark_flag_choices(
