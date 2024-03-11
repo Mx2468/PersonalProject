@@ -10,6 +10,9 @@ from helpers import constants
 from core.benchmarking import Benchmarker
 from multiprocessing import Manager
 
+from reader.flag_configuration_reader import FlagConfigurationReader
+
+
 # Sets up global variables for lock and value for processess to commuinicate
 def init_globals(flag, lock):
     global global_flag
@@ -148,18 +151,9 @@ if __name__ == '__main__':
 
     benchmarker = Benchmarker(input_source_code_file)
 
-    # TODO: Implement a reader to load these flags in as true/their default values as provided to allow them to be used directly
-    o3_flags_obj = Flags()
-    o3_flags_obj.load_in_flags("./flags/O3_flags.txt", "./flags/o3_domain_flags.json")
-    all_flags = controller.flags.get_all_flag_names()
-    o3_flag_names = o3_flags_obj.get_all_flag_names()
-    for flag in all_flags:
-        o3_flags_obj.add_flag(flag, controller.flags.get_flag_domain(flag),
-                              controller.flags.get_flag_default(flag))
-
-    o3_flags = {bin_flag: True for bin_flag in o3_flags_obj.get_all_flag_names()}
-    for domain_flag, value in o3_flags_obj.get_domain_flag_defaults().items():
-        o3_flags[domain_flag] = value
+    o3_reader = FlagConfigurationReader("./flags/O3_flags.txt", "./flags/o3_domain_flags.json")
+    o3_reader.read_in_flags()
+    o3_flags = o3_reader.get_flag_configuration()
 
     # By itself, the flags combination for 03 mentioned in the GCC page causes errors - this needs to be validated
     o3_flags = validate_flag_choices(o3_flags)
