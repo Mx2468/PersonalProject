@@ -1,4 +1,4 @@
-from core.flags import Flags
+import helpers
 
 class FlagChoicesExporter:
     def __init__(self, file_name: str, flags: dict[str, bool|str]):
@@ -20,5 +20,4 @@ class FlagChoicesExporter:
 
     def export_flags(self):
         print(f"Writing flag choices to {self.file_name}")
-        for flag_name, value in self.flags.items():
-            self.file.write(f"{flag_name}={value} ")
+        self.file.write(helpers.create_flag_string(self.flags))
