@@ -1,5 +1,5 @@
 """A Module to run and control the running of the flag optimisation"""
-import os
+
 import sys
 
 from exporter.flag_choices import FlagChoicesExporter
