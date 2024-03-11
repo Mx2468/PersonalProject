@@ -3,33 +3,80 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - _libgcc_mutex=0.1=main
-  - _openmp_mutex=5.1=1_gnu
+  - _libgcc_mutex=0.1=conda_forge
+  - _openmp_mutex=4.5=2_gnu
   - binutils_impl_linux-64=2.38=h2a08ee3_1
   - binutils_linux-64=2.38.0=hc2dff05_0
+  - blas=1.0=mkl
+  - brotli=1.1.0=hd590300_1
+  - brotli-bin=1.1.0=hd590300_1
   - bzip2=1.0.8=h7b6447c_0
-  - ca-certificates=2023.11.17=hbcca054_0
+  - ca-certificates=2024.2.2=hbcca054_0
+  - contourpy=1.2.0=py312hdb19cb5_0
+  - cycler=0.12.1=pyhd8ed1ab_0
   - expat=2.5.0=h6a678d5_0
+  - fonttools=4.25.0=pyhd3eb1b0_0
+  - freetype=2.10.4=h0708190_1
   - gcc_impl_linux-64=11.2.0=h1234567_1
   - gcc_linux-64=11.2.0=h5c386dc_0
+  - intel-openmp=2023.1.0=hdb19cb5_46306
+  - joblib=1.3.2=pyhd8ed1ab_0
+  - jpeg=9e=h0b41bf4_3
   - kernel-headers_linux-64=2.6.32=he073ed8_16
+  - kiwisolver=1.4.4=py312h6a678d5_0
+  - lcms2=2.15=hfd0df8a_0
   - ld_impl_linux-64=2.38=h1181459_1
+  - lerc=3.0=h9c3ff4c_0
+  - libbrotlicommon=1.1.0=hd590300_1
+  - libbrotlidec=1.1.0=hd590300_1
+  - libbrotlienc=1.1.0=hd590300_1
+  - libdeflate=1.17=h0b41bf4_0
   - libffi=3.4.4=h6a678d5_0
   - libgcc-devel_linux-64=11.2.0=h1234567_1
-  - libgcc-ng=11.2.0=h1234567_1
-  - libgomp=11.2.0=h1234567_1
+  - libgcc-ng=13.2.0=h807b86a_5
+  - libgfortran-ng=13.2.0=h69a702a_5
+  - libgfortran5=13.2.0=ha4646dd_5
+  - libgomp=13.2.0=h807b86a_5
+  - libpng=1.6.37=h21135ba_2
   - libstdcxx-ng=11.2.0=h1234567_1
+  - libtiff=4.5.1=h6a678d5_0
   - libuuid=1.41.5=h5eee18b_0
+  - libwebp-base=1.3.2=hd590300_0
+  - lz4-c=1.9.4=h6a678d5_0
+  - matplotlib-base=3.8.0=py312h526ad5a_0
+  - mkl=2023.1.0=h213fc3f_46344
+  - mkl-service=2.4.0=py312h5eee18b_1
+  - mkl_fft=1.3.8=py312h5eee18b_0
+  - mkl_random=1.2.4=py312hdb19cb5_0
+  - munkres=1.1.4=pyh9f0ad1d_0
   - ncurses=6.4=h6a678d5_0
-  - openssl=3.0.12=h7f8727e_0
+  - numpy=1.26.3=py312hc5e2394_0
+  - numpy-base=1.26.3=py312h0da6c21_0
+  - openjpeg=2.4.0=h3ad879b_0
+  - openssl=3.2.1=hd590300_0
+  - packaging=24.0=pyhd8ed1ab_0
+  - pillow=10.2.0=py312h5eee18b_0
   - pip=23.3.1=py312h06a4308_0
+  - pyaml=23.12.0=pyhd8ed1ab_0
+  - pyparsing=3.0.9=pyhd8ed1ab_0
   - python=3.12.0=h996f2a0_0
+  - python-dateutil=2.9.0=pyhd8ed1ab_0
+  - pyyaml=6.0.1=py312h5eee18b_0
   - readline=8.2=h5eee18b_0
+  - scikit-learn=1.3.0=py312h526ad5a_2
+  - scikit-optimize=0.10.0=pyhd8ed1ab_0
+  - scipy=1.11.4=py312hc5e2394_0
   - setuptools=68.0.0=py312h06a4308_0
+  - six=1.16.0=pyh6c4a22f_0
   - sqlite=3.41.2=h5eee18b_0
   - sysroot_linux-64=2.12=he073ed8_16
+  - tbb=2021.8.0=hdb19cb5_0
+  - threadpoolctl=3.3.0=pyhc1e730c_0
   - tk=8.6.12=h1ccaba5_0
   - tzdata=2023c=h04d1e81_0
   - wheel=0.41.2=py312h06a4308_0
   - xz=5.4.5=h5eee18b_0
+  - yaml=0.2.5=h7f98852_2
   - zlib=1.2.13=h5eee18b_0
+  - zstd=1.5.5=hc292b87_0
+prefix: /root/anaconda/envs/PersonalProject
