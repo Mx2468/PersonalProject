@@ -9,20 +9,19 @@ import numpy as np
 
 class GeneticAlgorithmOptimiser(FlagOptimiser):
 
-    #TODO: Experiment with these current parameters (informed by research)
     #TODO: Move these parameters to a config file
-    MUTATION_RATE = 0.1
+    MUTATION_RATE = 0.05
     MIXING_NUMBER = 3
     ELITISM_ENABLED = True
-    ELITISM_NUMBER_CARRIED = 1
-    _n_population: int = 5
+    ELITISM_NUMBER_CARRIED = 2
+    _n_population: int = 10
     _current_flags: list[dict[str, bool]] = []
     _random_generator: np.random.Generator = np.random.default_rng()
     _flags_object: Flags
 
     def __init__(self,
                  flags_to_optimise: Flags,
-                 n_population: int = 5,
+                 n_population: int = 10,
                  starting_population: list[dict[str, bool|str]] = None):
         super().__init__(flags_to_optimise)
         # Setup initial random population
