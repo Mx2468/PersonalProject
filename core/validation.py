@@ -2,7 +2,6 @@
 from helpers import get_random_integer
 
 
-#TODO: Implement validation of domain flags against their domains
 def validate_flag_choices(flag_choices: dict[str, bool | str | list[str]]) -> dict[str, bool | str | list[str]]:
     flag_choices = validate_live_patching_issues(flag_choices)
     flag_choices = validate_link_time_optimisation_flags(flag_choices)
@@ -13,8 +12,6 @@ def validate_flag_choices(flag_choices: dict[str, bool | str | list[str]]) -> di
 
     flag_choices["-fsection-anchors"] = flag_choices["-ftoplevel-reorder"] = flag_choices["-funit-at-a-time"] # Needs to be the same as the others
 
-    # if "-ftree-parallelize-loops" in flag_choices.keys():
-    #     print(f"-ftree-parallelize-loops value: {flag_choices['-ftree-parallelize-loops']}")
     return flag_choices
 
 def validate_link_time_optimisation_flags(flag_choices: dict[str, bool | str | list[str]]) -> dict[str, bool | str | list[str]]:
