@@ -28,12 +28,13 @@ def get_cli_arguments():
     argparser.add_argument("-m", "--method",
                            dest="method",
                            help="Optimisation method used to optimise the flag choices.",
-                           choices=["random", "genetic"],
+                           choices=["random", "genetic", "gaussian"],
                            default="genetic")
 
     argparser.add_argument("-n", "--opt-steps",
                            dest="opt_steps",
-                           help="Number of optimisation steps to run. No value or a value below 1 means an anytime-algorithm will run.")
+                           help="Number of optimisation steps to run. No value or a value below 1 means an anytime-algorithm will run.",
+                           default=-1)
 
     argparser.add_argument("--num-code-runs",
                            dest="n_code_runs",

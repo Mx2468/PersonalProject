@@ -10,6 +10,7 @@ from helpers import constants
 from core.benchmarking import Benchmarker
 from multiprocessing import Manager
 
+from optimisers.gaussian_process import GaussianProcessOptimiser
 from reader.flag_configuration_reader import FlagConfigurationReader
 
 
@@ -169,8 +170,11 @@ if __name__ == '__main__':
     elif opt_method == "random":
         print("Using random search")
         optimiser = RandomSearchOptimiser(controller.flags)
+    elif opt_method == "gaussian":
+        print("Using gaussian process optimiser")
+        optimiser = GaussianProcessOptimiser(controller.flags)
     else:
-        raise ValueError("Invalid optimization method provided, only 'genetic' and 'random' are supported ")
+        raise ValueError("Invalid optimization method provided, only 'genetic', 'random' and 'gaussian' are supported ")
 
     if opt_steps is None or opt_steps <= 0:
         fastest_flags = controller.anytime_optimisation(optimiser, benchmarker)
