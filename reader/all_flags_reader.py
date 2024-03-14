@@ -40,3 +40,6 @@ class AllTypeFlagsReader:
         bin_domains = {flag_name: [True, False] for flag_name in self.bin_flag_names}
         merged_domains = {**bin_domains, **self.flag_domains}
         return merged_domains
+
+    def get_domain_flag_domains(self) -> dict[str, str|list[str]|list[bool]]:
+        return self.flag_domains
