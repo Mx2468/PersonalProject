@@ -1,4 +1,5 @@
 from skopt import gp_minimize
+from skopt.space import Categorical
 
 from core.benchmarking import Benchmarker
 from core.flags import Flags
@@ -27,6 +28,8 @@ class GaussianProcessOptimiser(FlagOptimiser):
                     self._domains.append((1, constants.INTEGER_DOMAIN_UPPER_BOUND))
                 else:
                     self._domains.append((0, constants.INTEGER_DOMAIN_UPPER_BOUND))
+            elif domain == [True, False]:
+                self._domains.append(Categorical(categories=(True, False), prior=None))
             else:
                 self._domains.append(tuple(domain))
             self._flags_in_order_of_domain.append(flag)
@@ -34,7 +37,7 @@ class GaussianProcessOptimiser(FlagOptimiser):
         self.x = [[]]
         self.y = None
         for set_of_flags in starting_flags:
-            for flag in self._flags_in_order_of_domain:
+            for i, flag in enumerate(self._flags_in_order_of_domain, 0):
                 value = set_of_flags[flag]
                 try:
                     int_val = int(value)
@@ -51,17 +54,17 @@ class GaussianProcessOptimiser(FlagOptimiser):
                              x0=self.x,
                              y0=self.y,
                              n_calls=n,
-                             acq_func="EI",
                              acq_optimizer="auto",
                              verbose=True)
-        self.print_optimisation_info()
         if self._fastest_time > result.fun:
             self._fastest_time = result.fun
             self._fastest_flags = validate_flag_choices(self._convert_to_flag_choice(result.x))
         return self._fastest_flags
 
     def continuous_optimise(self, benchmarker: Benchmarker) -> dict[str, bool]:
-        pass
+        print("Continuous optimisation is not currently possible with this algorithm - setting up a 1000 step optimisation run")
+        return self.n_steps_optimise(benchmarker, 1000)
+
     def optimisation_step(cls, flags: dict[str, bool]) -> dict[str, bool] | list[dict[str, bool]]:
         pass
 
@@ -69,7 +72,7 @@ class GaussianProcessOptimiser(FlagOptimiser):
         flag_choice = {}
         for index, value in enumerate(argument, 0):
             flag_name = self._flags_in_order_of_domain[index]
-            if self._domains[index] == (True, False):
+            if self._domains[index] == Categorical([True, False]):
                 flag_choice[flag_name] = bool(value)
             else:
                 flag_choice[flag_name] = str(value)
