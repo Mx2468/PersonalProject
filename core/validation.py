@@ -42,7 +42,7 @@ def validate_live_patching_issues(flag_choices: dict[str, bool|str|list[str]]) \
     if "-flive-patching" in flag_choices.keys():
         # FLTO is not supported with live patching - so remove live patching if flto is enabled
         if flag_choices["-flto"] != False:
-            flag_choices["-flive-patching"] = False
+            del flag_choices["-flive-patching"]
 
         else:
             inline_clone_disabled_flags = ["-fwhole-program", "-fipa-pta", "-fipa-reference", "-fipa-ra",
