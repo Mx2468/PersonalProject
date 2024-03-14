@@ -172,7 +172,7 @@ if __name__ == '__main__':
         optimiser = RandomSearchOptimiser(controller.flags)
     elif opt_method == "gaussian":
         print("Using gaussian process optimiser")
-        optimiser = GaussianProcessOptimiser(controller.flags)
+        optimiser = GaussianProcessOptimiser(controller.flags, starting_flags=flags_to_start)
     else:
         raise ValueError("Invalid optimization method provided, only 'genetic', 'random' and 'gaussian' are supported ")
 
@@ -186,7 +186,7 @@ if __name__ == '__main__':
     else:
         print("\nPlease wait for your flags to be compared with that of -03")
         benchmarker.compare_with_o3(
-            optimised_flags=create_flag_string(fastest_flags),
+            optimised_flags=create_flag_string(validate_flag_choices(fastest_flags)),
             o3_flags=create_flag_string(o3_flags))
         print("Press ^C again to exit")
     sys.exit(0)
