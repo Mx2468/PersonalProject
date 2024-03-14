@@ -22,7 +22,6 @@ class Flags:
         self.flag_domains = reader.get_all_flag_domains()
         self.domain_flag_default = reader.get_all_domain_defaults()
 
-
     def remove_flag(self, flag_name: str) -> None:
         """ Remove a flag from the object"""
         if flag_name in self.all_flag_names:
