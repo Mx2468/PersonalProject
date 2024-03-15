@@ -3,6 +3,13 @@ from helpers import get_random_integer
 
 
 def validate_flag_choices(flag_choices: dict[str, bool | str | list[str]]) -> dict[str, bool | str | list[str]]:
+    """
+    Validate a set of flag choices to remove incompatible choices, ensuring compilation without error
+
+    :param flag_choices: A dictionary mapping flag names to their chosen values
+    :return: A dictionary mapping flag names to their chosen values,
+    possibly adjusted to ensure they can be compiled
+    """
     flag_choices = validate_live_patching_issues(flag_choices)
     flag_choices = validate_link_time_optimisation_flags(flag_choices)
 
@@ -15,6 +22,13 @@ def validate_flag_choices(flag_choices: dict[str, bool | str | list[str]]) -> di
     return flag_choices
 
 def validate_link_time_optimisation_flags(flag_choices: dict[str, bool | str | list[str]]) -> dict[str, bool | str | list[str]]:
+    """
+    Validate flag choices w.r.t. link-time optimisation-related flags
+
+    :param flag_choices: A dictionary mapping flag names to their chosen values
+    :return: A dictionary mapping flag names to their chosen values,
+    possibly adjusted to ensure they can be compiled
+    """
     # Make sure compression level is in the right bounds
     flto_compression_level = int(flag_choices["-flto-compression-level"])
     if flto_compression_level < 0 or flto_compression_level > 19:
@@ -36,8 +50,12 @@ def validate_live_patching_issues(flag_choices: dict[str, bool|str|list[str]]) \
     Validates and corrects flags connected to live patching.
 
     Live patching is incompatible with many flags that positively impact performance, hence the
-    priority is to keep live-patching off if these flags are impacted. The level also impacted, as
+    priority is to keep live-patching off if these flags are impacted. The level of live patching also impacted, as
     "inline-only-static" is more restrictive in the flags it allows than "inline-clone".
+
+    :param flag_choices: A dictionary mapping flag names to their chosen values
+    :return: A dictionary mapping flag names to their chosen values,
+    possibly adjusted to ensure they can be compiled
     """
     if "-flive-patching" in flag_choices.keys():
         # FLTO is not supported with live patching - so remove live patching if flto is enabled
