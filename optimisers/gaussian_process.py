@@ -1,3 +1,7 @@
+"""
+A class implementing the `skopt` `gp_minimize` function as a
+gaussian process optimizer for optimisation flags
+"""
 from skopt import gp_minimize
 from skopt.space import Categorical
 
@@ -15,9 +19,12 @@ class GaussianProcessOptimiser(FlagOptimiser):
         super().__init__(all_flags)
         self.flags_obj = all_flags
         flag_domain_mapping = self.flags_obj.get_all_flag_domains()
+
+        # Removes flags that are problematic or have difficult domains to optimise
         flag_domain_mapping.pop("-fkeep-inline-dllexport")
         flag_domain_mapping.pop("-ffat-lto-objects")
         flag_domain_mapping.pop("-flive-patching")
+
         self._domains = []
         self._flags_in_order_of_domain = []
 
@@ -64,6 +71,7 @@ class GaussianProcessOptimiser(FlagOptimiser):
         return self._fastest_flags
 
     def continuous_optimise(self, benchmarker: Benchmarker) -> dict[str, bool]:
+        """Currently a wrapper for a long contract optimisation run"""
         print("Continuous optimisation is not currently possible with this algorithm - setting up a 1000 step optimisation run")
         return self.n_steps_optimise(benchmarker, 1000)
 
@@ -71,6 +79,12 @@ class GaussianProcessOptimiser(FlagOptimiser):
         pass
 
     def _convert_to_flag_choice(self, argument: list[str | int | bool]) -> dict[str, str | bool]:
+        """
+        Converts a list of arguments into a flag choice representation used by the rest of the program
+        :param argument: A list of values corresponding to flag/flag parameter choices for a flag,
+        in the order the flags were specified to the `gp_minimize` function
+        :return: A dictionary mapping the flag string to it's corresponding value
+        """
         flag_choice = {}
         for index, value in enumerate(argument, 0):
             flag_name = self._flags_in_order_of_domain[index]
@@ -82,6 +96,12 @@ class GaussianProcessOptimiser(FlagOptimiser):
         return flag_choice
 
     def runner_wrapper_function(self, *args) -> float:
+        """
+        A wrapper function to run and benchmark the flag choice provided by the gp_minimise function
+        :param args: A list containing the flag choice provided by the gp_minimise function,
+        in the order the dimensions where initially specified
+        :return: A float representing the benchmarked time of the flags
+        """
         # Convert args to a set of flag choices
         choice = self._convert_to_flag_choice(*args)
         # Validate flag choices
