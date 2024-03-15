@@ -140,6 +140,7 @@ if __name__ == '__main__':
     domain_input_flags = str(parsed_args.d_input_flags)
     dont_start_o3 = parsed_args.dont_start_o3
     dont_compare_o3 = parsed_args.dont_compare_o3
+    dont_use_standard_breaking_flags = parsed_args.dont_use_standard_breaking_flags
 
     # Make sure input source code is a c++ file - checks some of the most common c++ file endings.
     assert input_source_code_file.endswith((".cpp", ".C", ".cc")), "The input file must be a valid c++ file"

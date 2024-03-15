@@ -55,4 +55,9 @@ def get_cli_arguments() -> argparse.Namespace:
                            action='store_true',
                            help="Skip comparing with 03 flags after the optimisation of the flag choices has finished.")
 
+    argparser.add_argument("--dont-use-standard-breaking-flags",
+                           dest="dont_use_standard_breaking_flags",
+                           action='store_true',
+                           help="Skip using optimisation flags that break the C++ standard")
+
     return argparser.parse_args()
