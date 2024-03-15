@@ -66,10 +66,9 @@ class GaussianProcessOptimiser(FlagOptimiser):
                              x0=self.x,
                              y0=self.y,
                              n_calls=n,
-                             n_points=n//10,
                              initial_point_generator="lhs",
-                             acq_optimizer="auto",
-                             noise="gaussian",
+                             acq_optimizer="lbfgs",
+                             noise=0.4,
                              verbose=True)
         if self._fastest_time > result.fun:
             self._fastest_time = result.fun
