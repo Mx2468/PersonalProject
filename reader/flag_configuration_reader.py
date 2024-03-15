@@ -1,16 +1,23 @@
-# A module to read a subset of flags with defined values
+"""A class to read a subset of flags with defined chosen values"""
 from core.flags import Flags
 from reader.all_flags_reader import AllTypeFlagsReader
 import helpers.constants as constants
 
 class FlagConfigurationReader:
+    """A class to read a subset of flags with defined chosen values"""
+
     def __init__(self, binary_flag_file: str, domain_flag_file: str):
+        """
+        :param binary_flag_file: The path to the binary flags file to read in
+        :param domain_flag_file: The path to the domain flags file to read in
+        """
         self.binary_flag_file = binary_flag_file
         self.domain_flag_file = domain_flag_file
         self.flag_configuration = {}
         self.flags_obj = Flags()
 
     def read_in_flags(self) -> None:
+        """Reads in the flag configuration, filling in the missing values with false/defaults"""
         # Read flags the values are provided for
         reader = AllTypeFlagsReader(self.binary_flag_file, self.domain_flag_file)
         reader.read_in_flags()
@@ -44,7 +51,9 @@ class FlagConfigurationReader:
                                         reader.domain_defaults[flag_name])
 
     def get_flag_configuration(self) -> dict[str, str|bool]:
+        """Returns the flag configuration as a dictionary of flag names mapped to the flag value."""
         return self.flag_configuration
 
     def get_flag_obj(self) -> Flags:
+        """Returns the flag object built from the configuration read in"""
         return self.flags_obj
