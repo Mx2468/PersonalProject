@@ -1,4 +1,4 @@
-"""An abstract class for an optimiser of binary (on/off) flags"""
+"""An abstract class for an optimiser of optimisation flags"""
 from abc import ABC, abstractmethod
 
 from core.flags import Flags
@@ -7,7 +7,7 @@ from helpers import get_random_flag_sample
 
 
 class FlagOptimiser(ABC):
-    """A class to define an optimiser of binary (on/off) flags"""
+    """A class to define an optimiser of optimisation flags"""
     _fastest_flags: dict[str, bool] = {}
     _current_flags: dict[str, bool] = {}
     _fastest_time: float
@@ -15,6 +15,7 @@ class FlagOptimiser(ABC):
     _states_explored: int = 0
 
     def __init__(self, flags: Flags):
+        """:param flags: The `Flags` object containing the flags to optimise """
         self._fastest_flags = get_random_flag_sample(flags)
         self._current_flags = get_random_flag_sample(flags)
         self._fastest_time = float('inf')
@@ -23,6 +24,7 @@ class FlagOptimiser(ABC):
     def continuous_optimise(self, benchmarker: Benchmarker) -> dict[str, bool]:
         """
         Optimise the flags continuously until the algorithm is fully finished
+
         :param benchmarker: The object used to benchmark the code
         :return: The best flags once the algorithm has decided on a global minimum
         """
@@ -32,6 +34,7 @@ class FlagOptimiser(ABC):
     def n_steps_optimise(self, benchmarker: Benchmarker, n: int) -> dict[str, bool]:
         """
         Optimise the flags for a certain number of optimisation steps
+
         :param benchmarker: The object used to benchmark the code
         :param n: The number of optimisation steps used
         :return: The best flags after n optimisation steps
@@ -42,12 +45,14 @@ class FlagOptimiser(ABC):
     def optimisation_step(cls, flags: dict[str, bool]) -> dict[str, bool] | list[dict[str, bool]]:
         """
         Completes a step of the optimisation, returning the flags after the choice is made
+
         :param flags: A dictionary of flags and their on/off states to optimise
         :return: The flags suggested after the optimisation step
         """
         raise NotImplementedError
 
     def print_optimisation_info(self):
+        """An auxiliary method to print the ongoing progress of the optimisation"""
         print(f"Number of optimisation steps: {self._opt_steps_done}")
         print(f"Number of states explored: {self._states_explored}")
         print(f"Fastest time so far: {self._fastest_time}")
@@ -57,7 +62,9 @@ class FlagOptimiser(ABC):
         return self._current_flags
 
     def get_fastest_time(self) -> float:
+        """Returns the fastest time obtained"""
         return self._fastest_time
 
     def get_n_states_explored(self) -> int:
+        """Returns the number of states explored"""
         return self._states_explored
