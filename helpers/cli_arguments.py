@@ -1,8 +1,13 @@
+"""A module to handle the definition of CLI arguments."""
 import argparse
 import helpers.constants as constants
 
-def get_cli_arguments():
-    """Defines, parses and returns the program's CLI arguments/flags"""
+def get_cli_arguments() -> argparse.Namespace:
+    """
+    Defines, parses and returns the program's CLI arguments/flags
+
+    :return: An `argparse.Namespace` object containing the parsed CLI arguments and their provided values
+    """
     argparser = argparse.ArgumentParser(prog="Compiler flag optimiser",
                             description="A piece of software to optimise the optimisation options for the g++ compiler, given an input c++ file.")
 
