@@ -16,6 +16,11 @@ class Benchmarker:
     def __init__(self,
                  source_code_to_benchmark: str,
                  compiled_file_name: str = DEFAULT_COMPILED_FILE_NAME):
+        """
+        :param source_code_to_benchmark: The source code file to use for benchmarking flag choices
+        :param compiled_file_name: The name of the compiled binary file to use
+        (this defaults to "filetotest", but can be specified depending on the user's environment)
+        """
 
         self.SOURCE_CODE_FILE = source_code_to_benchmark
         self.COMPILED_CODE_FILE = compiled_file_name
@@ -25,8 +30,10 @@ class Benchmarker:
                            opt_flag: str) -> str:
         """
         Compile a c++ source code file with the specified flags
+
         :param output_file_name: The name of the compiled executable file at the end of the compilation process
         :param opt_flag: The string of optimisation flags to use for the compilation process
+        :returns: The name of the compiled file name as a string
         """
         if os.path.exists(output_file_name):
             os.remove(output_file_name)
@@ -41,10 +48,12 @@ class Benchmarker:
                                opt_flag: str,
                                number_of_runs: int = N_BENCHMARK_RUNS) -> float:
         """
-        Compiles a source file with given flag choices
-        and returns the benchmark time of the compiled code
+        Compiles a source file with given flag choices iteratively for a number of runs
+        and returns the benchmark time of the compiled code.
+
         :param opt_flag: The string of optimisation flags to use for the benchmarking
         :param number_of_runs: The number of runs over which to average the compilation process
+        :returns: The average time taken to run the compiled code
         """
         compiled_code_name = self.compile_with_flags(self.COMPILED_CODE_FILE, opt_flag)
         return self.time_needed(number_of_runs, self.run_compiled_code, compiled_code_name)
@@ -54,10 +63,12 @@ class Benchmarker:
                     function_to_run: callable,
                     output_file_name: str) -> float:
         """
-        For measuring time for a function to run
+        General function for measuring the time taken for a function to run over a number of repetitions
+
         :param number_of_repetitions: The number of runs over which the runtime is averaged
         :param function_to_run: The function that runs the code (self.run_compiled_code)
         :param output_file_name: The name of the compiled executable file
+        :returns: The average time taken for the function to run over the number of repetitions provided
         """
         for j in range(number_of_repetitions):
             start = time()
@@ -68,8 +79,13 @@ class Benchmarker:
 
 
     def run_compiled_code(self, *args) -> None:
-        """Executes the compiled code file, where the first argument in *args
-         should be the name of the compiled executable file to run"""
+        """
+        Executes the compiled code file, where the first argument in *args
+        should be the name of the compiled executable file to run
+
+        :param args: The to be provided to the run function (There should only be one argument,
+        and that is the string name of the compiled code file)
+        """
         # DEVNULL used to supress stdout - removes unnecessary prints
         # clogging up the console and obstructing optimisation information
         subprocess.run(f"./{args[0]}", shell=True, cwd=os.getcwd(), stdout=subprocess.DEVNULL)
@@ -77,6 +93,7 @@ class Benchmarker:
     def get_fresh_file_name(self) -> str:
         """
         Returns a unique name for the compiled executable file to run
+
         :return: The name of the compiled executable as a string
         """
         name = self.COMPILED_CODE_FILE + str(self.GLOBAL_COUNTER)
@@ -86,8 +103,9 @@ class Benchmarker:
     def compare_with_o3(self, optimised_flags: str, o3_flags: str) -> None:
         """
         Benchmarks and compares a given set of flag choices with -O3 flags.
+
         :param optimised_flags: A string of the optimised flags
-        :param o3_flags:
+        :param o3_flags: A string representing the flags used in -O3
         """
 
         opt_flag_time = self.parallel_benchmark_flags(optimised_flags)
@@ -104,6 +122,7 @@ class Benchmarker:
     def compare_two_flag_choices(self, opt_flag1: str, opt_flag2: str ) -> None:
         """
         A function to compare two different strings of flag choices
+
         :param opt_flag1: The first set of flag choices
         :param opt_flag2: The second set of flag choices
         """
@@ -116,6 +135,7 @@ class Benchmarker:
     def generate_unique_outputfile_names(start: int, end: int):
         """
         Generates a set of unique output file names for multiple threads
+
         :param start: The beginning number of the range of numbers to use in the file names
         :param end: The end number of the range of numbers to use in the file names
         :return: A generator of unique file names, using the range provided
@@ -126,6 +146,7 @@ class Benchmarker:
     def parallel_benchmark_flags(self, flag_string_to_benchmark: str, n_runs: int = N_BENCHMARK_RUNS) -> float:
         """
         Run and benchmark a flag string in parallel
+
         :param flag_string_to_benchmark: The string of optimisation flags to benchmark
         :param n_runs: The number of benchmark runs to run in parallel and average the result over
         :return: The averaged time taken to run the program with the given flags
