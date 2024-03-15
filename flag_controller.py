@@ -60,6 +60,7 @@ class FlagOptimisationController:
         """
         Run the optimisation for n steps and return the optimal flags after those steps
         :param n_steps: The number of steps to run the simulation for
+
         :param optimiser: The optimiser object that will be used to optimise the flags
         :param benchmark_obj: The object for benchmarking
         :return: The dictionary of flags and whether they were chosen or not
@@ -83,6 +84,7 @@ class FlagOptimisationController:
         """
         Runs the optimisation loop until the computation is stopped via ctrl+c,
         then prints out the flags to the user
+
         :param optimiser: The optimiser object that will be used to optimise the flags
         :param benchmark_obj: The object for benchmarking
         :return The dictionary of flags and whether they were chosen or not
