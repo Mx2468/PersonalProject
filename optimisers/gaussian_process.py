@@ -77,7 +77,10 @@ class GaussianProcessOptimiser(FlagOptimiser):
         return self._fastest_flags
 
     def continuous_optimise(self, benchmarker: Benchmarker) -> dict[str, bool]:
-        """Currently a wrapper for a long contract optimisation run"""
+        """
+        Currently a wrapper for a long contract optimisation run.
+        See `Optimiser.n_steps_optimise` for more details
+        """
         print("Continuous optimisation is not currently possible with this algorithm - setting up a 1000 step optimisation run")
         return self.n_steps_optimise(benchmarker, 1000)
 
@@ -87,6 +90,7 @@ class GaussianProcessOptimiser(FlagOptimiser):
     def _convert_to_flag_choice(self, argument: list[str | int | bool]) -> dict[str, str | bool]:
         """
         Converts a list of arguments into a flag choice representation used by the rest of the program
+
         :param argument: A list of values corresponding to flag/flag parameter choices for a flag,
         in the order the flags were specified to the `gp_minimize` function
         :return: A dictionary mapping the flag string to it's corresponding value
@@ -104,6 +108,7 @@ class GaussianProcessOptimiser(FlagOptimiser):
     def runner_wrapper_function(self, *args) -> float:
         """
         A wrapper function to run and benchmark the flag choice provided by the gp_minimise function
+
         :param args: A list containing the flag choice provided by the gp_minimise function,
         in the order the dimensions where initially specified
         :return: A float representing the benchmarked time of the flags
