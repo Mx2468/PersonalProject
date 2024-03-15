@@ -1,4 +1,4 @@
-# Module to read in binary choice flags to optimise
+"""A class to read in binary choice flags to optimise"""
 from reader.flag_file_reader import FlagFileReader
 
 
@@ -9,6 +9,7 @@ class BinaryFlagReader(FlagFileReader):
     (-f[flag] form as opposed to -fno[flag] form)
     """
     def __init__(self, file_name: str):
+        """:param file_name: The name of the file to read the flags from"""
         super().__init__(file_name)
 
     def read_in_flags(self) -> None:
