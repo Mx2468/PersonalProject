@@ -44,6 +44,8 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
         self.ELITISM_NUMBER_CARRIED = genetic_algorithm_config.ELITISM_NUMBER_CARRIED
         self.MUTATION_RATE = genetic_algorithm_config.MUTATION_RATE
         self.MIXING_NUMBER = genetic_algorithm_config.MIXING_NUMBER
+        self.RANDOM_INSERT_ENABLED = genetic_algorithm_config.RANDOM_INSERT_ENABLED
+        self.RANDOM_INSERT_INDIVIDUALS = genetic_algorithm_config.RANDOM_INSERT_INDIVIDUALS
 
 
     def continuous_optimise(self, benchmarker: Benchmarker) -> dict[str, bool]:
@@ -97,13 +99,25 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
         # Run benchmark on the individuals
         fitness_map = self.get_fitness_of_population(benchmarker)
 
+        # Elitism
         if self.ELITISM_ENABLED:
+            # Carry over specified number of fastest individuals
             if self.ELITISM_NUMBER_CARRIED == 1:
                 next_population.append(self._fastest_flags)
             else:
                 for flags_choice in self.get_n_fastest_flag_combinations(fitness_map, self.ELITISM_NUMBER_CARRIED):
                     next_population.append(flags_choice)
 
+        if self.RANDOM_INSERT_ENABLED:
+            if self.RANDOM_INSERT_INDIVIDUALS > self._n_population - len(next_population):
+                raise ValueError("The number of random individuals cannot be higher than the number "
+                                 "of the overall population after elitism is applied")
+            else:
+                # Insert specified number of random individuals
+                for i in range(self.RANDOM_INSERT_INDIVIDUALS):
+                    next_population.append(validate_flag_choices(get_random_flag_sample(self._flags_object)))
+
+        # Reproduce
         for i in range(self._n_population - len(next_population)):
             # Apply fitness function (benchmark)
             parents = self.choose_from_population(fitness_map)
