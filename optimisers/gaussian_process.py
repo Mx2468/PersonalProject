@@ -16,6 +16,11 @@ class GaussianProcessOptimiser(FlagOptimiser):
 
     benchmarker: Benchmarker = None
     def __init__(self, all_flags: Flags, starting_flags: list[dict[str, str|bool]]):
+        """
+        :param all_flags: A `Flags` object containing all flags to optimise
+        :param starting_flags: A list of flag choices
+        (dictionaries mapping flag names to their corresponding chosen values)
+        """
         super().__init__(all_flags)
         self.flags_obj = all_flags
         flag_domain_mapping = self.flags_obj.get_all_flag_domains()
@@ -64,6 +69,7 @@ class GaussianProcessOptimiser(FlagOptimiser):
                              n_points=n//10,
                              initial_point_generator="lhs",
                              acq_optimizer="auto",
+                             noise="gaussian",
                              verbose=True)
         if self._fastest_time > result.fun:
             self._fastest_time = result.fun
