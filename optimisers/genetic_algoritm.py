@@ -10,6 +10,7 @@ import numpy as np
 from optimisers.config import genetic_algorithm_config
 
 class GeneticAlgorithmOptimiser(FlagOptimiser):
+    """A class implementing a genetic algorithm approach to optimising flag choices"""
     _n_population: int = 10
     _current_flags: list[dict[str, bool]] = []
     _random_generator: np.random.Generator = np.random.default_rng()
@@ -19,6 +20,11 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
                  flags_to_optimise: Flags,
                  n_population: int = genetic_algorithm_config.INITIAL_POPULATION_SIZE,
                  starting_population: list[dict[str, bool|str]] = None):
+        """
+        :param flags_to_optimise: A `Flags` object that contains the flags to be optimised
+        :param n_population: The number of individuals used in each step of the optimisation
+        :param starting_population: A list of individual flag choices (dictionaries of flag names
+        """
 
         super().__init__(flags_to_optimise)
         # Setup initial random population
@@ -43,6 +49,7 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
     def continuous_optimise(self, benchmarker: Benchmarker) -> dict[str, bool]:
         """
         Optimise the flags continuously until the algorithm is fully finished
+
         :param benchmarker: The object used to benchmark the code
         :return: The best flags once the algorithm has decided on a global minimum
         """
@@ -57,6 +64,7 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
     def n_steps_optimise(self, benchmarker: Benchmarker, n: int) -> dict[str, bool]:
         """
         Optimise the flags for a certain number of optimisation steps
+
         :param benchmarker: The object used to benchmark the code
         :param n: The number of optimisation steps used
         :return: The best flags after n optimisation steps
@@ -80,6 +88,7 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
     def optimisation_step(self, benchmarker: Benchmarker) -> list[dict[str, bool]]:
         """
         Completes a step of the optimisation, returning the flags after the choice is made
+
         :param flags: A dictionary of flags and their on/off states to optimise from
         :return: The flags suggested after the optimisation step
         """
@@ -113,6 +122,7 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
     def get_n_fastest_flag_combinations(self, fitness_map: list[tuple], n: int) -> list[dict[str, bool]]:
         """
         Select the n fastest current flag combinations, as determined by a given set of fitness values
+
         :param fitness_array: An array of fitness values, in the same order as self.current_flags
         :param n: The number of flags to select
         :return: A list of flag combinations
@@ -129,6 +139,7 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
     def get_fitness_of_population(self, benchmarker: Benchmarker) -> list:
         """
         Assesses the fitness of the population
+
         :param benchmarker: The object used to benchmark individuals from the population
         :return: A numpy array of fitness values for the population, in the order of the population as in self.current_population
         """
@@ -152,6 +163,7 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
         """
         Chooses parents from the population with a probability distribution
         corresponding to the fitness of the individuals
+
         :param benchmarker: The benchmarking object
         :return: A list of individual flag choices to use as parents
         """
@@ -174,6 +186,7 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
     def reproduce(self, *parents: dict[str, bool | str]) -> dict[str, bool | str]:
         """
         Creates an offspring individual given two parent inputs
+
         :param parents: The number of parents to reproduce
         :return: An "offspring" set of flag choices reproduced from the two input parents
         """
@@ -198,6 +211,7 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
     def mutate_individual(self, individual: dict[str, bool|str]) -> dict[str, bool|str]:
         """
         Mutates an individual set of flag choices with a random small probability
+
         :param individual: The flag choices to randomly mutate
         :return: The mutated flag choices
         """
@@ -208,5 +222,9 @@ class GeneticAlgorithmOptimiser(FlagOptimiser):
         return individual
 
     def get_fastest_flags(self) -> dict[str, bool]:
-        """Returns the current fastest flags of the optimiser"""
+        """
+        Returns the current fastest flags of the optimiser
+
+        :returns dict[str, bool|str]: The fastest set of flag choices
+        """
         return self._fastest_flags
