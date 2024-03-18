@@ -66,13 +66,12 @@ class FlagOptimisationController:
         :return: The dictionary of flags and whether they were chosen or not
         """
         print(f"Running optimisation for {n_steps} steps")
-        optimiser.n_steps_optimise(benchmark_obj, n_steps)
+        optimised_flags = optimiser.n_steps_optimise(benchmark_obj, n_steps)
         print('The optimisation process finished')
         print(f"States Explored: {optimiser.get_n_states_explored()}")
         print(f"Fastest Time: {optimiser.get_fastest_time()}s")
         print(f"Fastest Flags: {create_flag_string(optimiser.get_fastest_flags())}")
         global output_file
-        optimised_flags = optimiser.get_fastest_flags()
         exporter = FlagChoicesExporter(output_file, optimised_flags)
         with exporter:
             exporter.export_flags()

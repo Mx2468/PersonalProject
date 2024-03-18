@@ -24,18 +24,14 @@ class RandomSearchOptimiser(FlagOptimiser):
             self.optimisation_step(benchmark_obj)
 
         # Clean up class for next optimisation run before returning flags
-        flags_to_return = self._fastest_flags
-        self._clear_between_runs()
-        return flags_to_return
+        return self._fastest_flags
 
     def n_steps_optimise(self, benchmark_obj: Benchmarker, n: int) -> dict[str, bool]:
         for i in range(n):
             self.optimisation_step(benchmark_obj)
 
         # Clean up class for next optimisation run before returning flags
-        flags_to_return = self._fastest_flags
-        self._clear_between_runs()
-        return flags_to_return
+        return self._fastest_flags
 
     def optimisation_step(self, benchmark_obj: Benchmarker) -> None:
         """
