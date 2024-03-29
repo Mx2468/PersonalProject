@@ -34,7 +34,7 @@ def get_cli_arguments() -> argparse.Namespace:
                            dest="method",
                            help="Optimisation method used to optimise the flag choices.",
                            choices=["random", "genetic", "gaussian"],
-                           default="genetic")
+                           default="random")
 
     argparser.add_argument("-n", "--opt-steps",
                            dest="opt_steps",
