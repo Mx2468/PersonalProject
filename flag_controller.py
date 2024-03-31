@@ -142,6 +142,7 @@ if __name__ == '__main__':
     dont_start_o3 = parsed_args.dont_start_o3
     dont_compare_o3 = parsed_args.dont_compare_o3
     dont_use_standard_breaking_flags = parsed_args.dont_use_standard_breaking_flags
+    log_results = parsed_args.log_results
 
     # Make sure input source code is a c++ file - checks some of the most common c++ file endings.
     assert input_source_code_file.endswith((".cpp", ".C", ".cc")), "The input file must be a valid c++ file"
@@ -183,11 +184,25 @@ if __name__ == '__main__':
         fastest_flags = controller.contract_optimisation(opt_steps, optimiser, benchmarker)
 
     if dont_compare_o3:
-        pass
+        print("Using -O0 as a reference to compare flags with")
+        percentage_change = benchmarker.compare_two_flag_choices(
+            opt_flag1=create_flag_string(validate_flag_choices(fastest_flags)),
+            reference_flags="-O0"
+        )
+
     else:
         print("\nPlease wait for your flags to be compared with that of -03")
-        benchmarker.compare_with_o3(
+        percentage_change = benchmarker.compare_with_o3(
             optimised_flags=create_flag_string(validate_flag_choices(fastest_flags)),
             o3_flags=create_flag_string(o3_flags))
+
+    print(f"Percentage change: {percentage_change}")
+
+    if log_results:
+        with open(f"runlog.log", "a") as logfile:
+            logfile.write(f"{opt_method} {opt_steps}: {percentage_change}\n")
         print("Press ^C again to exit")
+    else:
+        pass
+
     sys.exit(0)
