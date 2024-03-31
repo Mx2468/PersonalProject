@@ -43,7 +43,7 @@ def get_cli_arguments() -> argparse.Namespace:
 
     argparser.add_argument("--num-code-runs",
                            dest="n_code_runs",
-                           help="Number of code runs used to benchmark the ")
+                           help="Number of code runs used to benchmark the compiled code")
 
     argparser.add_argument("--dont-start-with-o3",
                            dest="dont_start_o3",
@@ -59,5 +59,10 @@ def get_cli_arguments() -> argparse.Namespace:
                            dest="dont_use_standard_breaking_flags",
                            action='store_true',
                            help="Skip using optimisation flags that break the C++ standard")
+
+    argparser.add_argument("--log-results",
+                           dest="log_results",
+                           action='store_true',
+                           help="Log the results of the optimisation")
 
     return argparser.parse_args()
