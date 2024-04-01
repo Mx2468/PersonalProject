@@ -3,7 +3,7 @@
 import sys
 
 from exporter.flag_choices import FlagChoicesExporter
-from helpers.cli_arguments import get_cli_arguments
+from helpers.cli_arguments import CLIArguments
 from optimisers import *
 import signal
 from helpers import constants
@@ -125,12 +125,10 @@ class FlagOptimisationController:
         except ReturnToMain:
             return optimiser.get_fastest_flags()
 
-# TODO: Add run scripts for a variety of necessary scenarios
-# TODO: Change as many class attributes as possible to private
 if __name__ == '__main__':
     # Define all input arguments
-
-    parsed_args = get_cli_arguments()
+    arguments = CLIArguments()
+    parsed_args = arguments.get_parsed_cli_arguments()
 
     # Read in all arguments
     input_source_code_file = str(parsed_args.input)
