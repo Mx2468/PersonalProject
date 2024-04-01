@@ -1,0 +1,3 @@
+INITIAL_POINT_GENERATOR_METHOD = "lhs"
+ACQUISITION_METHOD = "lbfgs"
+NOISE = 'gaussian'

@@ -11,6 +11,7 @@ from core.validation import validate_flag_choices
 from helpers import create_flag_string
 from optimisers import FlagOptimiser
 import helpers.constants as constants
+import optimisers.config.gaussian_process_config as configuration
 
 class GaussianProcessOptimiser(FlagOptimiser):
 
@@ -70,9 +71,9 @@ class GaussianProcessOptimiser(FlagOptimiser):
                              x0=self.x,
                              y0=self.y,
                              n_calls=n,
-                             initial_point_generator="lhs",
-                             acq_optimizer="lbfgs",
-                             noise=0.4,
+                             initial_point_generator=configuration.INITIAL_POINT_GENERATOR_METHOD,
+                             acq_optimizer=configuration.ACQUISITION_METHOD,
+                             noise=configuration.NOISE,
                              verbose=True)
         if self._fastest_time > result.fun:
             self._fastest_time = result.fun
