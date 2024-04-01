@@ -46,18 +46,22 @@ class GaussianProcessOptimiser(FlagOptimiser):
                 self._domains.append(tuple(domain))
             self._flags_in_order_of_domain.append(flag)
 
-        self.x = [[]]
-        self.y = None
-        for set_of_flags in starting_flags:
-            for i, flag in enumerate(self._flags_in_order_of_domain, 0):
-                value = set_of_flags[flag]
-                try:
-                    int_val = int(value)
-                    self.x[0].append(int_val)
-                except TypeError:
-                    self.x[0].append(value)
-                except ValueError:
-                    self.x[0].append(value)
+        if starting_flags != []:
+            self.x = [[]]
+            self.y = None
+            for set_of_flags in starting_flags:
+                for i, flag in enumerate(self._flags_in_order_of_domain, 0):
+                    value = set_of_flags[flag]
+                    try:
+                        int_val = int(value)
+                        self.x[0].append(int_val)
+                    except TypeError:
+                        self.x[0].append(value)
+                    except ValueError:
+                        self.x[0].append(value)
+        else:
+            self.x = None
+            self.y = None
 
     def n_steps_optimise(self, benchmarker: Benchmarker, n: int) -> dict[str, bool|str]:
         self.benchmarker = benchmarker
