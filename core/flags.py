@@ -95,4 +95,5 @@ class Flags:
         :param flag_name: The name of the flag to get the default value for
         :return: The default value for the flag provided
         """
-        return self.domain_flag_default[flag_name]
+        if flag_name in self.domain_flag_default.keys():
+            return self.domain_flag_default[flag_name]
