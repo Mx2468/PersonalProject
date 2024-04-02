@@ -72,7 +72,8 @@ class GaussianProcessOptimiser(FlagOptimiser):
                              y0=self.y,
                              n_calls=n,
                              initial_point_generator=configuration.INITIAL_POINT_GENERATOR_METHOD,
-                             acq_optimizer=configuration.ACQUISITION_METHOD,
+                             acq_func=configuration.ACQUISITION_FUNCTION,
+                             acq_optimizer=configuration.ACQUISITION_OPTIMISATION_METHOD,
                              noise=configuration.NOISE,
                              verbose=True)
         if self._fastest_time > result.fun:
