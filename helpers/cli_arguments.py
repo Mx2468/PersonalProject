@@ -39,7 +39,8 @@ class CLIArguments:
 
         self.argparser.add_argument("--num-code-runs",
                                dest="n_code_runs",
-                               help="Number of code runs used to benchmark the compiled code")
+                               help="Number of code runs used to benchmark the compiled code",
+                               default=3)
 
         self.argparser.add_argument("--dont-start-with-o3",
                                dest="dont_start_o3",
@@ -59,7 +60,7 @@ class CLIArguments:
         self.argparser.add_argument("--log-results",
                                dest="log_results",
                                action='store_true',
-                               help="Log the results of the optimisation")
+                               help="Log the improvement result of the optimisation")
 
     def get_parsed_cli_arguments(self) -> argparse.Namespace:
         """
