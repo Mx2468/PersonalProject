@@ -122,25 +122,25 @@ class Benchmarker:
         percentage_change = ((o3_flag_time-opt_flag_time)/o3_flag_time)*100
         return percentage_change
 
-    def compare_two_flag_choices(self, opt_flag1: str, reference_flags: str ) -> float:
+    def compare_two_flag_choices(self, opt_flags: str, reference_flags: str ) -> float:
         """
         A function to compare two different strings of flag choices
 
-        :param opt_flag1: The first set of flag choices
-        :param opt_flag2: The second set of flag choices
+        :param opt_flags: The optimised set of flag choices
+        :param reference_flags: The reference set of flag choices
         :returns: The percentage change between the two flag choices
         """
-        flags_time1 = self.parallel_benchmark_flags(opt_flag1)
-        flags_time2 = self.parallel_benchmark_flags(reference_flags)
+        opt_flag_time = self.parallel_benchmark_flags(opt_flags)
+        ref_flag_time = self.parallel_benchmark_flags(reference_flags)
 
-        print(f"\nOptimised flag time: {flags_time1}")
-        print(f"Reference flag time: {reference_flags}")
+        print(f"\nOptimised flag time: {opt_flag_time}")
+        print(f"Reference flag time: {ref_flag_time}")
 
-        if flags_time1 < flags_time2:
+        if opt_flag_time < ref_flag_time:
             print("The optimised flags are faster than the reference")
         else:
             print("The optimised flags perform the same or worse than the reference")
-        percentage_change = ((flags_time2 - flags_time1) / flags_time2) * 100
+        percentage_change = ((ref_flag_time - opt_flag_time) / ref_flag_time) * 100
         return percentage_change
 
     @staticmethod

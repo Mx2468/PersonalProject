@@ -184,7 +184,7 @@ if __name__ == '__main__':
     if dont_compare_o3:
         print("Using -O0 as a reference to compare flags with")
         percentage_change = benchmarker.compare_two_flag_choices(
-            opt_flag1=create_flag_string(validate_flag_choices(fastest_flags)),
+            opt_flags=create_flag_string(validate_flag_choices(fastest_flags)),
             reference_flags="-O0"
         )
 
