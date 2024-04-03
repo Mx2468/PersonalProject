@@ -160,3 +160,7 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
+# Other files to ignore:
+flags_dump.txt
+.runlog.log.swp
+filetotest
