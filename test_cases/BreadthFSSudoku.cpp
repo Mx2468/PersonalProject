@@ -1,5 +1,5 @@
-#include "Sudoku.h"
-#include "BreadthFirstSearch.h"
+#include "./include/Sudoku.h"
+#include "./include/BreadthFirstSearch.h"
 
 #include <vector>
 #include <string>
