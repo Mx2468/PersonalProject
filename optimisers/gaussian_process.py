@@ -71,6 +71,7 @@ class GaussianProcessOptimiser(FlagOptimiser):
                              x0=self.x,
                              y0=self.y,
                              n_calls=n,
+                             n_initial_points=configuration.N_INITIAL_POINTS,
                              initial_point_generator=configuration.INITIAL_POINT_GENERATOR_METHOD,
                              acq_func=configuration.ACQUISITION_FUNCTION,
                              acq_optimizer=configuration.ACQUISITION_OPTIMISATION_METHOD,
