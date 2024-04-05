@@ -1,5 +1,7 @@
-# Number of points to sample before gaussian process estimator starts estimating the best points to select
-N_INITIAL_POINTS = 228
+# Number of points to sample before gaussian process estimator starts estimating
+# the best points to select. Default is 15 to enable shorter runs,
+# but for long runs (>=300 steps), a value of 228 or more is recommended.
+N_INITIAL_POINTS = 15
 
 # Generator of initial set of random points - default set to latin hypercube
 INITIAL_POINT_GENERATOR_METHOD = "lhs"
