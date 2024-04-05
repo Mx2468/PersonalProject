@@ -42,8 +42,8 @@ class RandomSearchOptimiser(FlagOptimiser):
         self._current_flags = self.get_random_flags()
 
         validated_flag_choice = validate_flag_choices(self._current_flags)
-        current_time = benchmark_obj.benchmark_flag_choices(
-            opt_flag=create_flag_string(validated_flag_choice))
+        current_time = benchmark_obj.parallel_benchmark_flags(
+            flag_string_to_benchmark=create_flag_string(validated_flag_choice))
 
         if self._fastest_time is None or current_time < self._fastest_time:
             self._fastest_time = current_time
