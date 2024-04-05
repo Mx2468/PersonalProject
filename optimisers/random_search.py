@@ -10,9 +10,11 @@ from helpers import create_flag_string
 
 class RandomSearchOptimiser(FlagOptimiser):
     """A class for random search optimisation of compiler flags"""
-    def __init__(self, flags_to_optimise: Flags):
+    def __init__(self, flags_to_optimise: Flags, starting_flags: list[dict[str, str|bool]]):
         super().__init__(flags_to_optimise)
         self.__flags_object = flags_to_optimise
+        if starting_flags != []:
+            self._current_flags = starting_flags[0]
 
     def get_random_flags(self) -> dict[str, bool]:
         """Returns a random validated choice of flags, ready for compilation"""
@@ -20,6 +22,7 @@ class RandomSearchOptimiser(FlagOptimiser):
 
     def continuous_optimise(self, benchmark_obj: Benchmarker) -> dict[str, bool]:
         # Explores the state space until it is done (as part of an anytime algorithm)
+        self.evaluate_flags(benchmark_obj, self._current_flags)
         while self._states_explored < 2 ** len(self._current_flags.keys()):
             self.optimisation_step(benchmark_obj)
 
@@ -27,6 +30,7 @@ class RandomSearchOptimiser(FlagOptimiser):
         return self._fastest_flags
 
     def n_steps_optimise(self, benchmark_obj: Benchmarker, n: int) -> dict[str, bool]:
+        self.evaluate_flags(benchmark_obj, self._current_flags)
         for i in range(n):
             self.optimisation_step(benchmark_obj)
 
@@ -42,17 +46,19 @@ class RandomSearchOptimiser(FlagOptimiser):
         self._current_flags = self.get_random_flags()
 
         validated_flag_choice = validate_flag_choices(self._current_flags)
-        current_time = benchmark_obj.parallel_benchmark_flags(
-            flag_string_to_benchmark=create_flag_string(validated_flag_choice))
-
-        if self._fastest_time is None or current_time < self._fastest_time:
-            self._fastest_time = current_time
-            self._fastest_flags = self._current_flags
+        self.evaluate_flags(benchmark_obj, validated_flag_choice)
 
         self._states_explored += 1
         self._opt_steps_done += 1
         self.print_optimisation_info()
 
+    def evaluate_flags(self, benchmark_obj: Benchmarker, flag_choice: dict[str, bool]) -> None:
+        current_time = benchmark_obj.parallel_benchmark_flags(
+            flag_string_to_benchmark=create_flag_string(flag_choice))
+
+        if self._fastest_time is None or current_time < self._fastest_time:
+            self._fastest_time = current_time
+            self._fastest_flags = self._current_flags
 
     def _clear_between_runs(self):
         """Clears all the lingering state in the class between optimisation runs"""

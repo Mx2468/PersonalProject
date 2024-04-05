@@ -141,6 +141,10 @@ if __name__ == '__main__':
     dont_compare_o3 = parsed_args.dont_compare_o3
     dont_use_standard_breaking_flags = parsed_args.dont_use_standard_breaking_flags
     log_results = parsed_args.log_results
+    n_code_runs = parsed_args.n_code_runs
+
+    # Set the number of benchmark runs to the number provided by the user
+    constants.N_BENCHMARK_RUNS = n_code_runs
 
     # Make sure input source code is a c++ file - checks some of the most common c++ file endings.
     assert input_source_code_file.endswith((".cpp", ".C", ".cc")), "The input file must be a valid c++ file"
@@ -169,7 +173,7 @@ if __name__ == '__main__':
         optimiser = GeneticAlgorithmOptimiser(controller.flags, starting_population=flags_to_start)
     elif opt_method == "random":
         print("Using random search")
-        optimiser = RandomSearchOptimiser(controller.flags)
+        optimiser = RandomSearchOptimiser(controller.flags, starting_flags=flags_to_start)
     elif opt_method == "gaussian":
         print("Using gaussian process optimiser")
         optimiser = GaussianProcessOptimiser(controller.flags, starting_flags=flags_to_start)
