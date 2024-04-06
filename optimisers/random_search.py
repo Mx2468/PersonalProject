@@ -14,7 +14,7 @@ class RandomSearchOptimiser(FlagOptimiser):
         super().__init__(flags_to_optimise)
         self.__flags_object = flags_to_optimise
         if starting_flags != []:
-            self._current_flags = starting_flags[0]
+            self._current_flags = validate_flag_choices(starting_flags[0])
 
     def get_random_flags(self) -> dict[str, bool]:
         """Returns a random validated choice of flags, ready for compilation"""

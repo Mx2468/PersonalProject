@@ -48,6 +48,7 @@ class GaussianProcessOptimiser(FlagOptimiser):
             self._flags_in_order_of_domain.append(flag)
 
         if starting_flags != []:
+            self.starting_flags = starting_flags
             self.x = [[]]
             self.y = None
             for set_of_flags in starting_flags:
@@ -65,7 +66,17 @@ class GaussianProcessOptimiser(FlagOptimiser):
             self.y = None
 
     def n_steps_optimise(self, benchmarker: Benchmarker, n: int) -> dict[str, bool|str]:
+        # Evaluate starting flags
+        for flag_comb in self.starting_flags:
+            validated_flag_comb = validate_flag_choices(flag_comb)
+            current_time = benchmarker.parallel_benchmark_flags(
+                create_flag_string(validated_flag_comb))
+            if current_time < self._fastest_time:
+                self._fastest_flags = flag_comb
+                self._fastest_time = current_time
+
         self.benchmarker = benchmarker
+        # Optimise for n steps
         result = gp_minimize(func=self.runner_wrapper_function,
                              dimensions=self._domains,
                              x0=self.x,
