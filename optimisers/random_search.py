@@ -13,8 +13,11 @@ class RandomSearchOptimiser(FlagOptimiser):
     def __init__(self, flags_to_optimise: Flags, starting_flags: list[dict[str, str|bool]]):
         super().__init__(flags_to_optimise)
         self.__flags_object = flags_to_optimise
-        if starting_flags != []:
+        if starting_flags:
             self._current_flags = validate_flag_choices(starting_flags[0])
+        else:
+            self._current_flags = None
+
 
     def get_random_flags(self) -> dict[str, bool]:
         """Returns a random validated choice of flags, ready for compilation"""
@@ -22,7 +25,8 @@ class RandomSearchOptimiser(FlagOptimiser):
 
     def continuous_optimise(self, benchmark_obj: Benchmarker) -> dict[str, bool]:
         # Explores the state space until it is done (as part of an anytime algorithm)
-        self.evaluate_flags(benchmark_obj, self._current_flags)
+        if self._current_flags:
+            self.evaluate_flags(benchmark_obj, self._current_flags)
         while self._states_explored < 2 ** len(self._current_flags.keys()):
             self.optimisation_step(benchmark_obj)
 
@@ -30,7 +34,8 @@ class RandomSearchOptimiser(FlagOptimiser):
         return self._fastest_flags
 
     def n_steps_optimise(self, benchmark_obj: Benchmarker, n: int) -> dict[str, bool]:
-        self.evaluate_flags(benchmark_obj, self._current_flags)
+        if self._current_flags:
+            self.evaluate_flags(benchmark_obj, self._current_flags)
         for i in range(n):
             self.optimisation_step(benchmark_obj)
 
