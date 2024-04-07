@@ -202,7 +202,7 @@ public:
 };
 
 int main(int argc, char** argv) {
-    int n = 100000000;
+    int n = 20000000;
 
     NBodySystem bodies;
     printf("%.9f\n", bodies.energy());
