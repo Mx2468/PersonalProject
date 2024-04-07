@@ -70,10 +70,12 @@ class Benchmarker:
         :param output_file_name: The name of the compiled executable file
         :returns: The average time taken for the function to run over the number of repetitions provided
         """
+        start = 0
+        end = 0
         for j in range(number_of_repetitions):
-            start = time()
+            start += time()
             function_to_run(output_file_name)
-            end = time()
+            end += time()
         # time.time returns time in seconds, so conversion is not needed
         return (end - start) / number_of_repetitions
 
