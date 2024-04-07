@@ -56,6 +56,54 @@ int main() {
             ++retval;
         }
     }
+
+    // The following examples were taken from the following news article:
+    // mirror.co.uk/tv/tv-news/trickiest-countdown-maths-rounds-were-24411673
+
+    {
+        cout << "\n\nCountdown numbers game: {25,50,75,100,3,6}, target 952 (can be solved by e.g. 100 6 + 3 * 75 * 50 - 25 /)\n";
+
+        vector<int> numbers{25,50,75,100,3,6};
+        CountdownSolution answer = solveCountdownProblem(numbers, 952);
+
+
+        if (answer.getValue() == 952) {
+            cout << "4) Pass: Correctly got to the target of 952\n";
+        } else {
+            cout << "4) Fail: Should have got to the target of 952, but only got " << answer.getValue() << std::endl;
+            ++retval;
+        }
+    }
+
+    {
+        cout << "\n\nCountdown numbers game: {1,2,25,100,75,50}, target 940 (can be solved by e.g. 75 25 * 1 + 50 * 100 / 2 +)\n";
+
+        vector<int> numbers{1,2,25,100,75,50};
+        CountdownSolution answer = solveCountdownProblem(numbers, 940);
+
+
+        if (answer.getValue() == 940) {
+            cout << "4) Pass: Correctly got to the target of 940\n";
+        } else {
+            cout << "4) Fail: Should have got to the target of 940, but only got " << answer.getValue() << std::endl;
+            ++retval;
+        }
+    }
+
+    {
+        cout << "\n\nCountdown numbers game: {1,10,25,50,75,100}, target 813 (can be solved by e.g. 75 10 - 25 * 1 + 50 * 100 /)\n";
+
+        vector<int> numbers{1,10,25,50,75,100};
+        CountdownSolution answer = solveCountdownProblem(numbers, 813);
+
+
+        if (answer.getValue() == 813) {
+            cout << "4) Pass: Correctly got to the target of 813\n";
+        } else {
+            cout << "4) Fail: Should have got to the target of 813, but only got " << answer.getValue() << std::endl;
+            ++retval;
+        }
+    }
     
     return retval;
 }
