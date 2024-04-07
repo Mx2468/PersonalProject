@@ -90,6 +90,7 @@ class GaussianProcessOptimiser(FlagOptimiser):
                              acq_optimizer=configuration.ACQUISITION_OPTIMISATION_METHOD,
                              noise=configuration.NOISE,
                              verbose=True)
+        self._states_explored += n
         if self._fastest_time > result.fun:
             self._fastest_time = result.fun
             self._fastest_flags = validate_flag_choices(self._convert_to_flag_choice(result.x))
