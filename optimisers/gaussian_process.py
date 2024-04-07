@@ -62,18 +62,20 @@ class GaussianProcessOptimiser(FlagOptimiser):
                     except ValueError:
                         self.x[0].append(value)
         else:
+            self.starting_flags = None
             self.x = None
             self.y = None
 
     def n_steps_optimise(self, benchmarker: Benchmarker, n: int) -> dict[str, bool|str]:
         # Evaluate starting flags
-        for flag_comb in self.starting_flags:
-            validated_flag_comb = validate_flag_choices(flag_comb)
-            current_time = benchmarker.parallel_benchmark_flags(
-                create_flag_string(validated_flag_comb))
-            if current_time < self._fastest_time:
-                self._fastest_flags = flag_comb
-                self._fastest_time = current_time
+        if self.starting_flags:
+            for flag_comb in self.starting_flags:
+                validated_flag_comb = validate_flag_choices(flag_comb)
+                current_time = benchmarker.parallel_benchmark_flags(
+                    create_flag_string(validated_flag_comb))
+                if current_time < self._fastest_time:
+                    self._fastest_flags = flag_comb
+                    self._fastest_time = current_time
 
         self.benchmarker = benchmarker
         # Optimise for n steps
