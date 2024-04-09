@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-conda env create --file personal_project_environment.yml
+conda env create --file ./setup/personal_project_environment.yml
