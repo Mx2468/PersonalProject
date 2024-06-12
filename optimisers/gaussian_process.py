@@ -2,7 +2,7 @@
 A class implementing the `skopt` `gp_minimize` function as a
 gaussian process optimizer for optimisation flags
 """
-from skopt import gp_minimize
+from skopt import Optimizer
 from skopt.space import Categorical
 
 from core.benchmarking import Benchmarker
@@ -38,7 +38,7 @@ class GaussianProcessOptimiser(FlagOptimiser):
         for flag, domain in flag_domain_mapping.items():
             if domain == "Integer" or domain == "Integer-align" or domain == "Integer-or-binary":
                 if flag == "-flto":
-                    self._domains.append((1, constants.INTEGER_DOMAIN_UPPER_BOUND))
+                    self._domains.append((1, 19))
                 else:
                     self._domains.append((0, constants.INTEGER_DOMAIN_UPPER_BOUND))
             elif domain == [True, False]:
@@ -66,46 +66,52 @@ class GaussianProcessOptimiser(FlagOptimiser):
             self.x = None
             self.y = None
 
-    def n_steps_optimise(self, benchmarker: Benchmarker, n: int) -> dict[str, bool|str]:
+    def evaluate_starting_flags(self):
         # Evaluate starting flags
         if self.starting_flags:
             for flag_comb in self.starting_flags:
                 validated_flag_comb = validate_flag_choices(flag_comb)
-                current_time = benchmarker.parallel_benchmark_flags(
+                # TODO: Create converter to the skopt domain
+                # TODO: Update optimizer obj with starting flag values
+                current_time = self.benchmarker.parallel_benchmark_flags(
                     create_flag_string(validated_flag_comb))
                 if current_time < self._fastest_time:
                     self._fastest_flags = flag_comb
                     self._fastest_time = current_time
 
+
+    def _create_necesary_objects(self, benchmarker: Benchmarker) -> None:
         self.benchmarker = benchmarker
-        # Optimise for n steps
-        result = gp_minimize(func=self.runner_wrapper_function,
-                             dimensions=self._domains,
-                             x0=self.x,
-                             y0=self.y,
-                             n_calls=n,
-                             n_initial_points=configuration.N_INITIAL_POINTS,
-                             initial_point_generator=configuration.INITIAL_POINT_GENERATOR_METHOD,
-                             acq_func=configuration.ACQUISITION_FUNCTION,
-                             acq_optimizer=configuration.ACQUISITION_OPTIMISATION_METHOD,
-                             noise=configuration.NOISE,
-                             verbose=True)
-        self._states_explored += n
+        self._optimizer_obj = Optimizer(dimensions=self._domains,
+                  n_initial_points=configuration.N_INITIAL_POINTS,
+                  initial_point_generator=configuration.INITIAL_POINT_GENERATOR_METHOD,
+                  acq_func=configuration.ACQUISITION_FUNCTION,
+                  acq_optimizer=configuration.ACQUISITION_OPTIMISATION_METHOD,
+                  n_jobs=-1)
+
+    def n_steps_optimise(self, benchmarker: Benchmarker, n: int) -> dict[str, bool | str]:
+        self._create_necesary_objects(benchmarker)
+        self.evaluate_starting_flags()
+        for i in range(n):
+            self.optimisation_step()
+        return self._fastest_flags
+
+    def continuous_optimise(self, benchmarker: Benchmarker) -> dict[str, bool | str]:
+        self._create_necesary_objects(benchmarker)
+        self.evaluate_starting_flags()
+        while self._states_explored < 2 ** len(self._current_flags.keys()):
+            self._current_flags = self.optimisation_step()
+        return self._fastest_flags
+
+    def optimisation_step(self, flags: dict[str, bool] = None) -> dict[str, bool] | list[dict[str, bool]]:
+        result = self._optimizer_obj.run(self.runner_wrapper_function)
+        self._states_explored += 1
+        self._opt_steps_done += 1
         if self._fastest_time > result.fun:
             self._fastest_time = result.fun
             self._fastest_flags = validate_flag_choices(self._convert_to_flag_choice(result.x))
+        self.print_optimisation_info()
         return self._fastest_flags
-
-    def continuous_optimise(self, benchmarker: Benchmarker) -> dict[str, bool]:
-        """
-        Currently a wrapper for a long contract optimisation run.
-        See `Optimiser.n_steps_optimise` for more details
-        """
-        print("Continuous optimisation is not currently possible with this algorithm - setting up a 1000 step optimisation run")
-        return self.n_steps_optimise(benchmarker, 1000)
-
-    def optimisation_step(cls, flags: dict[str, bool]) -> dict[str, bool] | list[dict[str, bool]]:
-        pass
 
     def _convert_to_flag_choice(self, argument: list[str | int | bool]) -> dict[str, str | bool]:
         """
@@ -124,6 +130,9 @@ class GaussianProcessOptimiser(FlagOptimiser):
                 flag_choice[flag_name] = str(value)
 
         return flag_choice
+
+    def _convert_to_skopt_domain(self, flag_choice: dict[str, str | bool]) -> list[str | int | bool]:
+        pass
 
     def runner_wrapper_function(self, *args) -> float:
         """
