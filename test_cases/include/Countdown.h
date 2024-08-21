@@ -38,7 +38,6 @@ public:
 
 // Do not edit above this line
 
-// TODO: write code here:
 
 using std::string;
 #include <utility>

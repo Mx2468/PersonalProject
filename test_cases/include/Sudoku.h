@@ -3,7 +3,6 @@
 
 #include "Searchable.h"
 
-// TODO: Your Sudoku class goes here:
 #include <vector>
 using std::vector;
 #include <set>

@@ -6,7 +6,6 @@
 
 class SudokuSquareSet {
 
-    // TODO: write your code here
 private:
     unsigned int values;
     int number_of_bits;
