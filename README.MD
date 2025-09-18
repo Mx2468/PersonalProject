@@ -1,3 +1,6 @@
+# Final Year Personal Project
+This repo is the code for my BSc final year project - "Compiler Optimisation using AI". It implements and compares classical model-based AI optimisation techniques to optimise the gnu C++ compiler settings for optimal code performance. The techniques are compared to a baseline - random search. 
+
 ## Setting Up The Environment
 Setting up the environment for the first time is done by using the provided environment file. Everything needed is provided in the ./setup/ directory.
 The environment contains the list of all packages that conda has to install, including all the exact versions required. This is a YAML file is located in path ./setup/personal_project_environment.yml
